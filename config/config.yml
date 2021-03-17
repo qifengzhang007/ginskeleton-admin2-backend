@@ -1,0 +1,124 @@
+AppDebug: true   # 设置程序所处的模式，debug=true 调试模式，日志优先显示在控制台， debug=false 非调试模式，将写入日志文件
+
+PageSize: 10
+
+#百度地图参数配置
+Zoom: 11
+
+HttpServer:
+  Api:
+    Port: ":20171"                 #门户网站类端口,注意前面有冒号
+  Web:
+    Port: ":20201"                 #后端应用类端口,注意前面有冒号
+  AllowCrossDomain: true           #是否允许跨域，默认 允许，注意：本项目跨域和nginx跨域只能允许设置一个即可，如果同时设置跨域，反而会造成无法跨域
+
+Token:
+  JwtTokenCreatedExpireAt: 28800      #创建时token默认有效秒数（token生成时间加上该时间秒数，算做有效期）,3600*8=28800
+  JwtTokenRefreshExpireAt: 36000      #对于过期的token，支持从相关接口刷新获取新的token，默认有效期为10个小时，3600*10=36000
+
+Redis:
+  Host: "192.168.8.62"
+  Port: 6379
+  Auth: ""
+  MaxIdle: 10
+  MaxActive: 1000
+  IdleTimeout: 60
+  IndexDb: 1
+  ConnFailRetryTimes: 3    #从连接池获取连接失败，最大重试次数
+  ReConnectInterval: 1     # 从连接池获取连接失败，每次重试之间间隔的秒数
+
+Logs:
+  GinLogName: "/storage/logs/gin.log"                  #设置 gin 框架的接口访问日志
+  GoSkeletonLogName: "/storage/logs/goskeleton.log"    #设置GoSkeleton项目骨架运行时日志文件名，注意该名称不要与上一条重复 ,避免和 gin 框架的日志掺杂一起，造成混乱。
+  TextFormat: "json"                                #记录日志的格式，参数选项：console、json ， console 表示一般的文本格式
+  TimePrecision: "millisecond"                         #记录日志时，相关的时间精度，该参数选项：second  、 millisecond ， 分别表示 秒 和 毫秒 ,默认为毫秒级别
+  MaxSize: 10                                           #每个日志的最大尺寸(以MB为单位）， 超过该值，系统将会自动进行切割
+  MaxBackups: 7                                        #保留旧日志最大个数
+  MaxAge: 15                                           #保留旧日志最大天数
+  Compress: false                                      #日志备份时，是否进行压缩
+
+Websocket: #该服务与Http具有相同的ip、端口，因此不需要额外设置端口
+  Start: 1                            #默认不启动该服务（1=启动；0=不启动）
+  WriteReadBufferSize: 20480          # 读写缓冲区分配字节，大概能存储 6800 多一点的文字
+  MaxMessageSize: 65535               # 从消息管道读取消息的最大字节
+  PingPeriod: 30                      #心跳包频率，单位：秒
+  HeartbeatFailMaxTimes: 4            # 允许心跳失败的最大次数（默认设置为PingPeriod=30秒检测一次，连续4次没有心跳就会清除后端在线信息）
+  ReadDeadline: 0                     # 客户端在线情况下，正常的业务消息间隔秒数必须小于该值，否则服务器将会主动断开,单位：秒。 0 表示不设限制，即服务器不主动断开不发送任何消息的在线客户端
+  WriteDeadline: 35                   # 消息单次写入超时时间，单位：秒
+
+SnowFlake:
+  SnowFlakeMachineId: 2               #如果本项目同时部署在多台机器，并且需要同时使用该算法，请为每一台机器设置不同的ID，区间范围: [0,1023]
+
+FileUploadSetting:
+  Size: 32                            #设置上传文件的最大值，单位：M，注意： 如果go前置nginx服务器，nginx 默认限制文件上传大小为 50 M ,用户上传文件限制还需要继续修改 nginx 配置
+  UploadFileField: "file"            #post上传文件时，表单的键名
+  UploadFileSavePath: "/storage/app/uploaded/" #上传文件保存在路径, 该路径与 BasePath 进行拼接使用
+  UploadFileReturnPath: "/storage/uploaded/"
+  AllowMimeType: #允许的文件mime类型列表
+    - "image/jpeg"                    #jpg、jpeg图片格式
+    - "image/png"                     #png图片格式
+    - "image/x-icon"                  #ico图片
+    - "image/bmp"                     #bmp图片
+    - "application/zip"               #xlsx、docx、zip
+    - "application/x-gzip"            #tar.gz
+    - "text/plain; charset=utf-8"     #txt log json等文本文件
+
+RabbitMq:
+  HelloWorld:
+    Addr: "amqp://账号:密码@ip地址:5672"                        #消息服务器地址、账号、密码
+    QueueName: "helloword_queue"
+    Durable: false                                        #消息是否持久化
+    ConsumerChanNumber: 2                                 #消费者通道数量（允许一个消费者使用几个连接通道消费、处理消息）
+    OffLineReconnectIntervalSec: 5                       #消费者掉线后,重连间隔的秒数
+    RetryCount: 5                                         #消费者掉线后,尝试重连最大次数
+  WorkQueue:
+    Addr: "amqp://账号:密码@ip地址:5672"                        #消息服务器地址、账号、密码
+    QueueName: "work_queue"
+    Durable: false                                        #消息是否持久化
+    ConsumerChanNumber: 2                                 #消费者通道数量（允许一个消费者使用几个连接通道消费、处理消息）
+    OffLineReconnectIntervalSec: 5                       #消费者掉线后,重连间隔的秒数
+    RetryCount: 5                                         #消费者掉线后,尝试重连最大次数
+  PublishSubscribe:
+    Addr: "amqp://账号:密码@ip地址:5672"                        #消息服务器地址、账号、密码
+    ExchangeType: "fanout"
+    ExchangeName: "fanout_exchange"
+    Durable: false                                        #消息是否持久化
+    QueueName: ""                                         #队列名称，为空 表示所有订阅的消费者（consumer）都可以接受到同样的消息，如果设置名称，会导致只有最后一个启动的消费者能接受到消息。
+    ConsumerChanNumber: 1                                 #消费者通道数量（发布、订阅模式消费者使用一个通道，避免多个通道重复收到数据）
+    OffLineReconnectIntervalSec: 10                       #消费者掉线后,重连间隔的秒数
+    RetryCount: 5                                         #消费者掉线后,尝试重连最大次数
+  Routing:
+    Addr: "amqp://账号:密码@ip地址:5672"                       #消息服务器地址、账号、密码
+    ExchangeType: "direct"
+    ExchangeName: "direct_exchange"
+    Durable: false                                        #消息是否持久化
+    QueueName: ""
+    OffLineReconnectIntervalSec: 10                       #消费者掉线后,重连间隔的秒数
+    RetryCount: 5                                         #消费者掉线后,尝试重连最大次数
+  Topics:
+    Addr: "amqp://账号:密码@ip地址:5672"                        #消息服务器地址、账号、密码
+    ExchangeType: "topic"
+    ExchangeName: "topic_exchange"
+    Durable: false                                        #消息是否持久化
+    QueueName: ""
+    OffLineReconnectIntervalSec: 10                       #消费者掉线后,重连间隔的秒数
+    RetryCount: 5                                         #消费者掉线后,尝试重连最大次数
+
+# 接口权限控制
+Casbin:
+  IsInit: 1 # 是否随项目启动同步初始化：1=是；0=否,
+  AutoLoadPolicySeconds: 5 # 扫描数据库策略的频率(单位：秒)
+  TablePrefix: "tb"
+  TableName: "auth_casbin_rule"  # 程序最终创建的表为： tb_casbin_rule (即在前缀和名称之间自动添加了下划线 _ )
+  ModelConfig: |    # 竖线 | 表示以下整段文本保持换行格式
+    [request_definition]
+    r = sub, obj, act
+    [policy_definition]
+    p = sub, obj, act
+    [role_definition]
+    g = _ , _
+    [policy_effect]
+    e = some(where (p.eft == allow))
+    [matchers]
+    m = (g(r.sub, p.sub) || p.sub == "*" ) && keyMatch(r.obj , p.obj) && (r.act == p.act || p.act == "*")
+

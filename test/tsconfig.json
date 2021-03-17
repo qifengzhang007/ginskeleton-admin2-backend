@@ -1,0 +1,433 @@
+{
+  "code": 200,
+  "msg": "ok",
+  "data": {
+    "cityId": 321,
+    "detail": {
+      "index_title": "xx市xx区xx社区智慧养老信息平台",
+      "tab_home": "首页",
+      "tab_map": "在线地图",
+      "tab_video": "视频监控",
+      "self_area_aged_num_statistics": {
+        "describe": "本区域老年轻人数量统计",
+        "detail": [
+          {
+            "title": "老年人总数",
+            "num": 200000,
+            "percent": "",
+            "unit": "人"
+          },
+          {
+            "title": "男性老年人",
+            "num": 100000,
+            "percent": "占比50%",
+            "unit": "人"
+          },
+          {
+            "title": "女性老年人",
+            "num": 100000,
+            "percent": "占比50%",
+            "unit": "人"
+          },
+          {
+            "title": "社区老年人占比",
+            "num": 40.5,
+            "percent": "",
+            "unit": "%"
+          }
+        ]
+      },
+      "self_area_aged_age_statistics": {
+        "describe": "老年人年龄分类",
+        "detail": [
+          {
+            "title": "60-64岁",
+            "num": 20210,
+            "unit": "人"
+          },
+          {
+            "title": "65-69岁",
+            "num": 10850,
+            "unit": "人"
+          },
+          {
+            "title": "70-79岁",
+            "num": 10400,
+            "unit": "人"
+          },
+          {
+            "title": "80-89岁",
+            "num": 10000,
+            "unit": "人"
+          },
+          {
+            "title": "90-99岁",
+            "num": 4540,
+            "unit": "人"
+          },
+          {
+            "title": "100岁及以上",
+            "num": 999,
+            "unit": "人"
+          }
+        ]
+      },
+      "self_area_health_staticstics": {
+        "describe": "老年人分类",
+        "detail": [
+          {
+            "status": "孤老",
+            "num": 1990,
+            "unit": "人",
+            "percent": "65%"
+          },
+          {
+            "status": "独居",
+            "num": 1690,
+            "unit": "人",
+            "percent": "61%"
+          },
+          {
+            "status": "纯老",
+            "num": 1750,
+            "unit": "人",
+            "percent": "59%"
+          },
+          {
+            "status": "低保",
+            "num": 1250,
+            "unit": "人",
+            "percent": "75%"
+          },
+          {
+            "status": "残疾",
+            "num": 1320,
+            "unit": "人",
+            "percent": "60%"
+          },
+          {
+            "status": "扶优",
+            "num": 1220,
+            "unit": "人",
+            "percent": "45%"
+          }
+        ]
+      },
+      "long_term_insurance": {
+        "describe": "长护险",
+        "list": [
+          {
+            "title": "申请人数",
+            "num": 50000,
+            "unit": "人"
+          },
+          {
+            "title": "通过人数",
+            "num": 39965,
+            "unit": "人"
+          }
+        ],
+        "last_6month_list": {
+          "title": "照护统计",
+          "sub_title": "最近6个月",
+          "detail": [
+            {
+              "date_time": "2020-10-01",
+              "person_num": 11702,
+              "unit": "人"
+            },
+            {
+              "date_time": "2020-09-01",
+              "person_num": 12002,
+              "unit": "人"
+            },
+            {
+              "date_time": "2020-08-01",
+              "person_num": 11025,
+              "unit": "人"
+            },
+            {
+              "date_time": "2020-07-01",
+              "person_num": 10402,
+              "unit": "人"
+            },
+            {
+              "date_time": "2020-06-01",
+              "person_num": 8957,
+              "unit": "人"
+            },
+            {
+              "date_time": "2020-05-01",
+              "person_num": 9999,
+              "unit": "人"
+            }
+          ]
+        }
+      },
+      "home_care": {
+        "describe": "居家养老",
+        "server_list": [
+          {
+            "title": "服务老人",
+            "num": 12543,
+            "unit": "人/年"
+          },
+          {
+            "title": "服务工单",
+            "num": 10000,
+            "unit": "单/年"
+          }
+        ],
+        "server_detail": [
+          {
+            "num": 10001,
+            "title": "助医服务",
+            "unit": "人"
+          },
+          {
+            "num": 11001,
+            "title": "助浴服务",
+            "unit": "人"
+          },
+          {
+            "num": 12001,
+            "title": "相谈服务",
+            "unit": "人"
+          },
+          {
+            "num": 13001,
+            "title": "康复辅助",
+            "unit": "人"
+          },
+          {
+            "num": 14001,
+            "title": "助行服务",
+            "unit": "人"
+          },
+          {
+            "num": 15001,
+            "title": "生活护理",
+            "unit": "人"
+          },
+          {
+            "num": 16001,
+            "title": "特色服务",
+            "unit": "人"
+          },
+          {
+            "num": 17001,
+            "title": "代办服务",
+            "unit": "人"
+          },
+          {
+            "num": 18001,
+            "title": "洗涤服务",
+            "unit": "人"
+          },
+          {
+            "num": 18001,
+            "title": "助洁服务",
+            "unit": "人"
+          }
+        ]
+      },
+      "join_pension_person_distribution": {
+        "describe": "参与养老人数分布",
+        "join_aged_list": [
+          {
+            "title": "居家养老人数",
+            "num": 90000,
+            "unit": "人"
+          },
+          {
+            "title": "社区养老人数",
+            "num": 7000,
+            "unit": "人"
+          },
+          {
+            "title": "机构养老人数",
+            "num": 3000,
+            "unit": "人"
+          },
+          {
+            "title": "覆盖老人总人数",
+            "num": 3060,
+            "unit": "人"
+          }
+        ]
+      },
+      "institutional_num_distribution": {
+        "describe": "为老机构数量",
+        "data_drilling_api": "http://192.168.8.62:20171/api/v1/portal/institutional/detail?id=",
+        "detail": [
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 1,
+            "title": "综合为老服务中心",
+            "num": 99,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 2,
+            "title": "睦邻中心",
+            "num": 88,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 3,
+            "title": "老年活动室",
+            "num": 78,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 4,
+            "title": "适老化智慧养老展示中心",
+            "num": 90,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 5,
+            "title": "老年日托所",
+            "num": 95,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 6,
+            "title": "助餐点",
+            "num": 99,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 7,
+            "title": "社区为老服务中心",
+            "num": 87,
+            "unit": "家"
+          },
+          {
+            "logo": "http://192.168.8.62:20171/public/favicon.ico",
+            "id": 8,
+            "title": "老年活动中心",
+            "num": 89,
+            "unit": "家"
+          }
+        ]
+      },
+      "server_list": {
+        "describe": "养老服务",
+        "lists": [
+          {
+            "item": "适老化改造",
+            "detail": [
+              {
+                "title": "服务对象",
+                "num": 9999,
+                "unit": "人"
+              },
+              {
+                "title": "共计家庭",
+                "num": 8888,
+                "unit": "个"
+              }
+            ]
+          },
+          {
+            "item": "老伙伴",
+            "detail": [
+              {
+                "title": "服务对象",
+                "num": 9777,
+                "unit": "人"
+              },
+              {
+                "title": "志愿者",
+                "num": 9666,
+                "unit": "人"
+              }
+            ]
+          },
+          {
+            "item": "老吾老",
+            "detail": [
+              {
+                "title": "培训人数",
+                "num": 9555,
+                "unit": "人"
+              },
+              {
+                "title": "共计家庭",
+                "num": 94444,
+                "unit": "个"
+              }
+            ]
+          },
+          {
+            "item": "心悦夕阳",
+            "detail": [
+              {
+                "title": "服务人数",
+                "num": 9333,
+                "unit": "人"
+              },
+              {
+                "title": "服务工单数",
+                "num": 9222,
+                "unit": "个"
+              }
+            ]
+          },
+          {
+            "item": "助浴",
+            "detail": [
+              {
+                "title": "服务人数",
+                "num": 9111,
+                "unit": "人"
+              },
+              {
+                "title": "刷卡次数",
+                "num": 9000,
+                "unit": "次"
+              }
+            ]
+          },
+          {
+            "item": "助餐",
+            "detail": [
+              {
+                "title": "服务人数",
+                "num": 8999,
+                "unit": "人"
+              },
+              {
+                "title": "刷卡次数",
+                "num": 8888,
+                "unit": "次"
+              }
+            ]
+          },
+          {
+            "item": "助餐",
+            "detail": [
+              {
+                "title": "服务人数",
+                "num": 8777,
+                "unit": "人"
+              },
+              {
+                "title": "刷卡次数",
+                "num": 8666,
+                "unit": "次"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
