@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
 	"goskeleton/app/model"
+	"goskeleton/app/model/auth"
 	"goskeleton/app/utils/response"
 )
 
@@ -48,10 +49,16 @@ func (s *Button) Edit(context *gin.Context) {
 
 //6.删除记录
 func (u *Button) Destroy(context *gin.Context) {
-	userId := context.GetFloat64(consts.ValidatorPrefix + "id")
-	if model.CreateButtonCnEnFactory("").DeleteData(int(userId)) {
-		response.Success(context, consts.CurdStatusOkMsg, "")
+	buttonId := context.GetFloat64(consts.ValidatorPrefix + "id")
+	//判断是否有菜单引用按钮,如果有,则禁止删除
+	if !auth.CreateAuthSystemMenuButtonFactory("").GetByButtonId(int(buttonId)) {
+		response.Fail(context, consts.CurdDeleteFailCode, "该按钮已被菜单引用,无法删除", "")
 	} else {
-		response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, "")
+		if model.CreateButtonCnEnFactory("").DeleteData(int(buttonId)) {
+			response.Success(context, consts.CurdStatusOkMsg, "")
+		} else {
+			response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, "")
+		}
 	}
+
 }

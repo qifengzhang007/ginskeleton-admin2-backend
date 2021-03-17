@@ -151,3 +151,12 @@ func (a *AuthSystemMenuButtonModel) UpdateHook(menuId int64) {
 		variable.ZapLog.Error("AuthSystemMenuButtonModel UpdateHook 更新 tb_auth_casbin_rule 出错", zap.Error(res.Error))
 	}
 }
+
+func (a *AuthSystemMenuButtonModel) GetByButtonId(butonId int) bool {
+	data := []AuthSystemMenuButtonModel{}
+	a.Where("fr_auth_button_cn_en_id = ?", butonId).Find(&data)
+	if len(data) != 0 {
+		return false
+	}
+	return true
+}
