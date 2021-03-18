@@ -93,7 +93,8 @@ func (u *UsersCurd) GetButtonListByMenuId(userId, menuId int64) (r []users.UserH
 // casbin 控制接口权限使用
 // 获取用户挂接组织机构的节点id(casbin对应表的roleId)，系统支持一人多岗位
 func (u *UsersCurd) GetUserOrgIdsByRedis(context *gin.Context) []int {
-	currentUser, exist := context.MustGet("customeToken").(my_jwt.CustomClaims)
+	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
+	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
 	if exist {
 		return u.getUserAllOrgIds(currentUser.UserId)
 	}

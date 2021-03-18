@@ -34,7 +34,9 @@ func CheckTokenAuth() gin.HandlerFunc {
 				tokenIsEffective := userstoken.CreateUserFactory().IsEffective(token[1])
 				if tokenIsEffective {
 					if customeToken, err := userstoken.CreateUserFactory().ParseToken(token[1]); err == nil {
-						context.Set("customeToken", customeToken)
+						key := variable.ConfigYml.GetString("Token.BindContextKeyName")
+						// token验证通过，同时绑定在请求上下文
+						context.Set(key, customeToken)
 					}
 					context.Next()
 				} else {

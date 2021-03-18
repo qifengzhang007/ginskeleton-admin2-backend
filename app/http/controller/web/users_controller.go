@@ -133,7 +133,8 @@ func (u *Users) Destroy(context *gin.Context) {
 
 //6.获取用户token信息+动态菜单
 func (u *Users) UserInfo(context *gin.Context) {
-	currentUser, exist := context.MustGet("customeToken").(my_jwt.CustomClaims)
+	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
+	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
 	if !exist {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
 	} else {
@@ -149,7 +150,8 @@ func (u *Users) UserInfo(context *gin.Context) {
 //查询用户当前打开的页面允许显示的按钮（查询指定页面拥有的按钮权限）
 func (u *Users) GetButtonListByMenuId(context *gin.Context) {
 	menuId := context.GetFloat64(consts.ValidatorPrefix + "menu_id")
-	currentUser, exist := context.MustGet("customeToken").(my_jwt.CustomClaims)
+	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
+	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
 
 	if !exist {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")

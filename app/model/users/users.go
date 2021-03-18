@@ -3,7 +3,6 @@ package users
 import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"goskeleton/app/global/consts"
 	"goskeleton/app/global/variable"
 	"goskeleton/app/model"
 	"goskeleton/app/utils/data_bind"
@@ -112,7 +111,8 @@ func (u *UsersModel) OauthDestroyToken(userId int) bool {
 // 判断用户token是否在数据库存在+状态OK
 func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
 	sql := "SELECT   token  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  updated_at  DESC  LIMIT ?"
-	rows, err := u.Raw(sql, userId, consts.JwtTokenOnlineUsers).Rows()
+	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
+	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
 	if err == nil && rows != nil {
 		for rows.Next() {
 			var tempToken string

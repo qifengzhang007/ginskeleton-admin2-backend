@@ -15,7 +15,7 @@ import (
 
 func CreateUserFactory() *userToken {
 	return &userToken{
-		userJwt: my_jwt.CreateMyJWT(consts.JwtTokenSignKey),
+		userJwt: my_jwt.CreateMyJWT(variable.ConfigYml.GetString("Token.JwtTokenSignKey")),
 	}
 }
 

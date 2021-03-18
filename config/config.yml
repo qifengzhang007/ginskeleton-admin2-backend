@@ -1,9 +1,4 @@
-AppDebug: true   # 设置程序所处的模式，debug=true 调试模式，日志优先显示在控制台， debug=false 非调试模式，将写入日志文件
-
-PageSize: 10
-
-#百度地图参数配置
-Zoom: 11
+AppDebug: true   # 设置程序所处的模式，debug=true 调试模式，日志优先显示在控制台， debug=false 非调试模式，日志将写入日志文件
 
 HttpServer:
   Api:
@@ -13,8 +8,11 @@ HttpServer:
   AllowCrossDomain: true           #是否允许跨域，默认 允许，注意：本项目跨域和nginx跨域只能允许设置一个即可，如果同时设置跨域，反而会造成无法跨域
 
 Token:
-  JwtTokenCreatedExpireAt: 28800      #创建时token默认有效秒数（token生成时间加上该时间秒数，算做有效期）,3600*8=28800
-  JwtTokenRefreshExpireAt: 36000      #对于过期的token，支持从相关接口刷新获取新的token，默认有效期为10个小时，3600*10=36000
+  JwtTokenSignKey:  "goskeleton"   #设置token生成时加密的签名
+  JwtTokenOnlineUsers:  10         #一个账号密码允许最大获取几个有效的token，当超过这个值，第一次获取的token的账号、密码就会失效
+  JwtTokenCreatedExpireAt: 28800      #创建时token默认有效秒数（token生成时间加上该时间秒数，算做有效期）,3600*8=28800 等于8小时
+  JwtTokenRefreshExpireAt: 36000      #对于过期的token，支持从相关接口刷新获取新的token，默认有效期为10个小时，3600*10=36000 等于10小时
+  BindContextKeyName: "userToken"     #用户在 header 头部提交的token绑定到上下文时的键名，方便直接从上下文(gin.context)直接获取每个用户的id等信息
 
 Redis:
   Host: "192.168.8.62"
@@ -29,7 +27,7 @@ Redis:
 
 Logs:
   GinLogName: "/storage/logs/gin.log"                  #设置 gin 框架的接口访问日志
-  GoSkeletonLogName: "/storage/logs/goskeleton.log"    #设置GoSkeleton项目骨架运行时日志文件名，注意该名称不要与上一条重复 ,避免和 gin 框架的日志掺杂一起，造成混乱。
+  GoSkeletonLogName: "/storage/logs/ginskeleton.log"    #设置GoSkeleton项目骨架运行时日志文件名，注意该名称不要与上一条重复 ,避免和 gin 框架的日志掺杂一起，造成混乱。
   TextFormat: "json"                                #记录日志的格式，参数选项：console、json ， console 表示一般的文本格式
   TimePrecision: "millisecond"                         #记录日志时，相关的时间精度，该参数选项：second  、 millisecond ， 分别表示 秒 和 毫秒 ,默认为毫秒级别
   MaxSize: 10                                           #每个日志的最大尺寸(以MB为单位）， 超过该值，系统将会自动进行切割
@@ -38,7 +36,7 @@ Logs:
   Compress: false                                      #日志备份时，是否进行压缩
 
 Websocket: #该服务与Http具有相同的ip、端口，因此不需要额外设置端口
-  Start: 1                            #默认不启动该服务（1=启动；0=不启动）
+  Start: 0                            #默认不启动该服务（1=启动；0=不启动）
   WriteReadBufferSize: 20480          # 读写缓冲区分配字节，大概能存储 6800 多一点的文字
   MaxMessageSize: 65535               # 从消息管道读取消息的最大字节
   PingPeriod: 30                      #心跳包频率，单位：秒
