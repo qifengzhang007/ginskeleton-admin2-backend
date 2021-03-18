@@ -10,8 +10,8 @@ import (
 )
 
 type PostMembersList struct {
-	OrgPostId *float64 `form:"org_post_id" json:"org_post_id" binding:"required,min=0"` // 必填，页面值>0
-	UserName  string   `form:"user_name" json:"user_name"`                              // 必填，页面值>0
+	OrgPostId *float64 `form:"org_post_id" json:"org_post_id" binding:"required,min=0"` // 必填，页面值>=0
+	UserName  string   `form:"user_name" json:"user_name"`
 	common_data_type.Page
 }
 

@@ -3,6 +3,7 @@ package register_validator
 import (
 	"goskeleton/app/core/container"
 	"goskeleton/app/global/consts"
+	"goskeleton/app/http/validator/api/home"
 	"goskeleton/app/http/validator/common/upload_files"
 	"goskeleton/app/http/validator/common/websocket"
 	"goskeleton/app/http/validator/web/auth/analysis"
@@ -21,6 +22,11 @@ func RegisterValidator() {
 
 	//  key 按照前缀+模块+验证动作 格式，将各个模块验证注册在容器
 	var key string
+
+	// 注册门户类表单参数验证器
+	key = consts.ValidatorPrefix + "HomeNews"
+	containers.Set(key, home.News{})
+
 	// Users 模块表单验证器按照 key => value 形式注册在容器，方便路由模块中调用
 	key = consts.ValidatorPrefix + "UsersRegister"
 	containers.Set(key, users.Register{})

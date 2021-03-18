@@ -59,7 +59,6 @@ func InitApiRouter() *gin.Engine {
 		// 2.编写该接口的验证器，位置：app/http/validator/api/home/news.go
 		// 3.将以上验证器注册在容器：app/http/validator/common/register_validator/register_validator.go  46行为注册时的键（consts.ValidatorPrefix + "HomeNews"）。那么获取的时候就用该键即可从容器获取
 		vApi.GET("news", validatorFactory.Create(consts.ValidatorPrefix+"PortalNews"))
-		vApi.GET("si_zhu", validatorFactory.Create(consts.ValidatorPrefix+"SiZhu"))
 
 	}
 	return router

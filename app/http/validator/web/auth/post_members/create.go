@@ -9,7 +9,7 @@ import (
 )
 
 type PostMembersCreate struct {
-	Create
+	BaseField
 }
 
 // 验证器语法，参见 Register.go文件，有详细说明

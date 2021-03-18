@@ -9,7 +9,7 @@ import (
 )
 
 type PostMembersEdit struct {
-	Create
+	BaseField
 	Id
 }
 

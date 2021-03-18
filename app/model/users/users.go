@@ -26,9 +26,9 @@ type UsersModel struct {
 	Status           int    `json:"status"`
 	FrProvinceCityId int    `gorm:"column:fr_province_city_id" json:"city_id"`
 	Avatar           string `gorm:"column:avatar" json:"avatar"`
-	//Token            string `json:"token"`
-	Remark      string `json:"remark"`
-	LastLoginIp string `gorm:"column:last_login_ip" json:"last_login_ip"`
+	LoginTimes       int    `json:"login_times"`
+	Remark           string `json:"remark"`
+	LastLoginIp      string `gorm:"column:last_login_ip" json:"last_login_ip"`
 }
 
 // 表名

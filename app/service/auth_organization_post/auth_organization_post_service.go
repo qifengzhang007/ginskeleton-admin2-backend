@@ -13,7 +13,7 @@ func (a *AuthOrganizationPostService) GetOrgByFid(fid int) (err error, data []au
 	for key, value := range data {
 		has := []auth.AuthOrganizationPostTree{}
 		id := value.Id
-		models.GetByFid(id, &has)
+		_ = models.GetByFid(id, &has)
 		if len(has) != 0 {
 			value.Children = []auth.AuthOrganizationPostTree{}
 			data[key] = value
