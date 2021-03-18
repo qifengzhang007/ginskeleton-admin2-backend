@@ -88,7 +88,7 @@ func (b *ButtonCnEnModel) InsertData(c *gin.Context) bool {
 	return false
 }
 
-//新增
+//更新
 func (b *ButtonCnEnModel) UpdateData(c *gin.Context) bool {
 	var tmp ButtonCnEnModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
