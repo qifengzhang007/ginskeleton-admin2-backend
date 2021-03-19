@@ -9,16 +9,16 @@ import (
 	"goskeleton/app/utils/response"
 )
 
-// 根据部门、岗位id以及用户关键词查询用户数据
+// 带岗位的用户列表
 
-type PostList struct {
+type WithPosUsertList struct {
 	UserName
 	OrgPostName string `form:"org_post_name" json:"org_post_name"` // 必填，页面值>0
 	common_data_type.Page
 }
 
 // 验证器语法，参见 Register.go文件，有详细说明
-func (p PostList) CheckParams(context *gin.Context) {
+func (p WithPosUsertList) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&p); err != nil {
 		errs := gin.H{

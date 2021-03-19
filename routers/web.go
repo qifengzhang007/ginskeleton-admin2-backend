@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"fmt"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
@@ -42,13 +41,11 @@ func InitWebRouter() *gin.Engine {
 	}
 
 	router.GET("/", func(context *gin.Context) {
-		context.String(http.StatusOK, "HelloWorld,这是后端模块")
+		context.String(http.StatusOK, "GinSkeleton-Admin-Backend")
 	})
 
-	//处理静态资源（不建议gin框架处理静态资源，参见 public/readme.md 说明 ）
-	router.Static("/public", "./public")             //  定义静态资源路由与实际目录映射关系
-	router.StaticFS("/dir", http.Dir("./public"))    // 将public目录内的文件列举展示
-	router.StaticFile("/abcd", "./public/readme.md") // 可以根据文件名绑定需要返回的文件名
+	//处理静态资源
+	router.Static("/public", "./public") //  定义静态资源路由与实际目录映射关系
 
 	// 创建一个验证码路由
 	verifyCode := router.Group("captcha")
@@ -71,24 +68,8 @@ func InitWebRouter() *gin.Engine {
 			// 1.编写一个表单参数验证器结构体，参见代码：   app/http/validator/web/users/register.go
 			// 2.将以上表单参数验证器注册，遵守 键 =》值 格式注册即可 ，app/http/validator/common/register_validator/register_validator.go  20行就是注册时候的键 consts.ValidatorPrefix+"UsersRegister"
 			// 3.按照注册时的键，直接从容器调用即可 ：validatorFactory.Create(consts.ValidatorPrefix+"UsersRegister")
-			noAuth.POST("register", validatorFactory.Create(consts.ValidatorPrefix+"UsersRegister"))
+			//noAuth.POST("register", validatorFactory.Create(consts.ValidatorPrefix+"UsersRegister")) // 将公开注册渠道关闭
 			noAuth.POST("login", validatorFactory.Create(consts.ValidatorPrefix+"UsersLogin"))
-			noAuth.GET("test/info", func(context *gin.Context) {
-				context.String(200, "接口访问成功！")
-
-			})
-			noAuth.GET("test/auth2020", func(context *gin.Context) {
-				context.String(200, "test/auth 接口访问成功！")
-
-			})
-
-			noAuth.GET("test/reload", func(context *gin.Context) {
-				if err := variable.Enforcer.LoadPolicy(); err != nil {
-					fmt.Printf("从数据库从在策略发生错误：%s\n", err.Error())
-				}
-				context.String(200, "test/relaod 家在结束！请刷新访问新增接口！")
-
-			})
 		}
 
 		// 【需要token】中间件验证的路由
@@ -102,16 +83,16 @@ func InitWebRouter() *gin.Engine {
 			{
 				// 查询 ，这里的验证器直接从容器获取，是因为程序启动时，将验证器注册在了容器，具体代码位置：App\Http\Validator\Web\Users\xxx
 				users.GET("list", validatorFactory.Create(consts.ValidatorPrefix+"UserList"))
-				users.GET("post_list", validatorFactory.Create(consts.ValidatorPrefix+"PostList"))
-				users.GET("has_view_button_list", validatorFactory.Create(consts.ValidatorPrefix+"ViewButtonList"))
 				// 新增
 				users.POST("create", validatorFactory.Create(consts.ValidatorPrefix+"UserCreate"))
 				// 更新
 				users.POST("edit", validatorFactory.Create(consts.ValidatorPrefix+"UserEdit"))
 				// 删除
 				users.POST("destroy", validatorFactory.Create(consts.ValidatorPrefix+"UserDestroy"))
-				// 获取信息 权限
+				// 用户获取动态菜单
 				users.GET("info", (&web.Users{}).UserInfo)
+				// 用户获取视图页面拥有的权限按钮
+				users.GET("has_view_button_list", validatorFactory.Create(consts.ValidatorPrefix+"ViewButtonList"))
 			}
 			//文件上传公共路由
 			uploadFiles := backend.Group("upload/")
@@ -174,11 +155,11 @@ func InitWebRouter() *gin.Engine {
 			{
 				// 查询
 				button.GET("list", validatorFactory.Create(consts.ValidatorPrefix+"ButtonList"))
-				//// 新增
+				// 新增
 				button.POST("create", validatorFactory.Create(consts.ValidatorPrefix+"ButtonCreate"))
-				//// 更新
+				// 更新
 				button.POST("edit", validatorFactory.Create(consts.ValidatorPrefix+"ButtonEdit"))
-				//// 删除
+				// 删除
 				button.POST("destroy", validatorFactory.Create(consts.ValidatorPrefix+"ButtonDestroy"))
 			}
 

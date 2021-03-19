@@ -104,7 +104,7 @@ func (b *ButtonCnEnModel) UpdateData(c *gin.Context) bool {
 	return false
 }
 
-//删除用户以及关联的token记录
+//删除
 func (b *ButtonCnEnModel) DeleteData(id int) bool {
 	if b.Delete(b, id).Error == nil {
 		return true
