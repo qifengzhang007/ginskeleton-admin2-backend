@@ -132,7 +132,7 @@ func (c ButtonCreate) CheckParams(context *gin.Context) {
 Status        *float64 `form:"status" json:"status" binding:"required,min=0"` 
 
 ```
-####  5 将以上表单参数验证器在容器进行注册  
+####  5 将以上表单参数验证器在容器进行注册 [相关详情](../app/http/validator/common/register_validator/RegisterValidator.go)
 ```code 
 	//按钮部分
 	{
@@ -144,7 +144,7 @@ Status        *float64 `form:"status" json:"status" binding:"required,min=0"`
 
 ```
 
-####  6 编写路由
+####  6 编写路由 [相关详情](../routers/web.go)
 ```code 
     // 按钮模块
     button := backend.Group("button/")
@@ -164,4 +164,4 @@ Status        *float64 `form:"status" json:"status" binding:"required,min=0"`
 
 #### 9 最后,前端开发相关的页面即可  
 > 相关代码请打开前端项目，路径：src/view/button/index.vue , 参考编写即可.  
-> 由于前后端是一个整体，前端开发也有注意事项，具体参见前端开发指南，后端部分至此已经开发完成.  
+> 由于前后端是一个整体，前端请按照前端开发指南进行开发项目.   
