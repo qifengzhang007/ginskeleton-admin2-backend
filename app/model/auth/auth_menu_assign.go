@@ -49,7 +49,7 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 		IFNULL(c.id,0) AS  post_mount_has_menu_button_id,
 		(CASE WHEN c.id>0 THEN 'button' ELSE 'menu' END) AS node_type,
 		IFNULL(d.cn_name,'')  AS  button_name,
-		1 as checked,1 as expand
+		0 as checked,1 as expand
 		FROM 
 		tb_auth_post_mount_has_menu  a  LEFT JOIN tb_auth_system_menu  b  ON  a.fr_auth_system_menu_id=b.id
 		LEFT JOIN tb_auth_post_mount_has_menu_button  c  ON  a.id=c.fr_auth_post_mount_has_menu_id
