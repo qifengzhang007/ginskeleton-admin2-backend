@@ -51,7 +51,7 @@ func (a *AuthSystemMenuModel) List(limitStart int, limit int, fid int, title str
 			WHERE a.id  IN(
 				SELECT id   FROM (SELECT id FROM   tb_auth_system_menu   WHERE fid=? AND title  LIKE  ?  LIMIT ?,?) AS tb_tmp 
 			)
-			ORDER   BY   a.sort  DESC,a.fid  ASC
+			ORDER   BY   a.sort  DESC,a.fid  ASC,button_id ASC
 		`
 		var sqlSlice []AuthSystemMenuButtonList
 		if res := a.Raw(sql, fid, "%"+title+"%", limitStart, limit).Find(&sqlSlice); res.Error == nil {
