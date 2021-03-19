@@ -136,16 +136,10 @@ func (a *AuthMenuAssignModel) DeleteCasbibRules(authPostMountHasMenuButtonId int
 	if nodeType == "button" {
 		sql := "DELETE FROM tb_auth_casbin_rule  WHERE fr_auth_post_mount_has_menu_button_id=? AND ptype='p' "
 		if res := a.Exec(sql, authPostMountHasMenuButtonId); res.Error != nil {
-			// 继续判断，删除角色继承关系 （2020-03-08 后续补充完善代码）
+			// 角色继承关系暂时不删除，只要删除相关的节点权限即可
 			variable.ZapLog.Error("AuthMenuAssignModel 删除casbin权限失败" + res.Error.Error())
 			resBool = false
 		}
-		// 获取当前按钮权限对应的角色id
-		//sql:="SELECT  v0  FROM  tb_auth_casbin_rule   WHERE  fr_auth_post_mount_has_menu_button_id=?  AND  ptype='p'  "
-		//var v0 string
-		//if res:=a.Raw(sql,authPostMountHasMenuButtonId).First(&v0);res.Error==nil{
-		//
-		//}
 
 	}
 	return
