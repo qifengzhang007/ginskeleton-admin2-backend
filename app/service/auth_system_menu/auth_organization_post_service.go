@@ -17,13 +17,8 @@ func (a *AuthSystemMenuService) GetOrgByFid(fid int) (err error, data []auth.Aut
 	models := auth.CreateAuthSystemMenuFactory("")
 	err = models.GetByFid(fid, &data)
 	for key, value := range data {
-		var hasSubNode []auth.AuthSystemMenuTree
-		_ = models.GetByFid(value.Id, &hasSubNode)
-		if len(hasSubNode) > 0 {
+		if value.HasSubNode > 0 {
 			value.Children = []auth.AuthSystemMenuTree{}
-			data[key] = value
-		} else {
-			value.Children = nil
 			data[key] = value
 		}
 	}

@@ -120,16 +120,17 @@ type AuthSystemMenuButtonListTree struct {
 
 //接口返回数据类型结构体（左侧菜单树）
 type AuthSystemMenuTree struct {
-	Id        int                  `json:"id" primaryKey:"yes" `
-	Fid       int                  `json:"fid" fid:"Id"`
-	Title     string               `json:"title"`
-	Name      string               `json:"name"`
-	Loading   bool                 `gorm:"-" json:"loading"`
-	Icon      string               `gorm:"icon" json:"icon"`
-	Path      string               `gorm:"path" json:"path"`
-	Component string               `json:"component"`
-	Remark    string               `json:"remark"`
-	Children  []AuthSystemMenuTree `gorm:"-" json:"children"`
+	Id         int                  `json:"id" primaryKey:"yes" `
+	Fid        int                  `json:"fid" fid:"Id"`
+	Title      string               `json:"title"`
+	Name       string               `json:"name"`
+	Loading    bool                 `gorm:"-" json:"loading"`
+	Icon       string               `gorm:"icon" json:"icon"`
+	Path       string               `gorm:"path" json:"path"`
+	Component  string               `json:"component"`
+	Remark     string               `json:"remark"`
+	HasSubNode int                  `json:"has_sub_node"`
+	Children   []AuthSystemMenuTree `gorm:"-" json:"children"`
 }
 
 // 系统菜单挂接的按钮列表
