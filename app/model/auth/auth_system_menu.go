@@ -136,7 +136,7 @@ func (a *AuthSystemMenuModel) updatePathInfoNodeLevel(curItemid int64) bool {
 
 //根据id查询是否有子节点数据
 func (a *AuthSystemMenuModel) GetSubNodeCount(id int) (count int64) {
-	if res := a.Model(a).Select("id").Where("fid = ?", id).Count(&count); res.Error != nil {
+	if res := a.Model(a).Where("fid = ?", id).Count(&count); res.Error != nil {
 		variable.ZapLog.Error("AuthSystemMenuModel 查询子节点是否有数据出错：", zap.Error(res.Error))
 	}
 	return count

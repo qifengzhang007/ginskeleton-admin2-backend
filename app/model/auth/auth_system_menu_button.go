@@ -153,6 +153,7 @@ func (a *AuthSystemMenuButtonModel) UpdateHook(menuId int64) {
 	}
 }
 
+// 判断按钮是否系统菜单引用
 func (a *AuthSystemMenuButtonModel) GetByButtonId(butonId int) bool {
 	data := []AuthSystemMenuButtonModel{}
 	a.Where("fr_auth_button_cn_en_id = ?", butonId).Find(&data)

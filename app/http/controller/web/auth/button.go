@@ -50,7 +50,7 @@ func (s *Button) Edit(context *gin.Context) {
 //6.删除记录
 func (u *Button) Destroy(context *gin.Context) {
 	buttonId := context.GetFloat64(consts.ValidatorPrefix + "id")
-	//判断是否有菜单引用按钮,如果有,则禁止删除
+	//判断按钮是否被系统菜单引用,如果有,则禁止删除
 	if !auth.CreateAuthSystemMenuButtonFactory("").GetByButtonId(int(buttonId)) {
 		response.Fail(context, consts.CurdDeleteFailCode, "该按钮已被菜单引用,无法删除", "")
 	} else {

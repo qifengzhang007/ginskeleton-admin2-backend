@@ -113,7 +113,7 @@ func (a *AuthOrganizationPostModel) DeleteData(id int) bool {
 	return false
 }
 func (a *AuthOrganizationPostModel) HasSubList(id int) (count int64) {
-	a.Model(a).Select("id").Where("id=?", id).Count(&count)
+	a.Model(a).Select("id").Where("fid=?", id).Count(&count)
 	return
 }
 
