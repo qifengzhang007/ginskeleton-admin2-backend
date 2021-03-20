@@ -81,6 +81,7 @@ func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuMo
 		if res := a.Model(a).Where("fid=? AND  title=?", tmp.Fid, tmp.Title).Count(&counts); res.Error == nil && counts == 0 {
 			if res := a.Create(&tmp); res.Error == nil {
 				//新增菜单后,处理按钮
+				go a.updatePathInfoNodeLevel(tmp.Id)
 				return true, tmp
 			} else {
 				variable.ZapLog.Error("AuthSystemMenuModel 新增失败", zap.Error(res.Error))
@@ -100,6 +101,7 @@ func (a *AuthSystemMenuModel) UpdateData(c *gin.Context) bool {
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
 		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
 		if res := a.Omit("CreatedAt").Save(tmp); res.Error == nil {
+			go a.updatePathInfoNodeLevel(tmp.Id)
 			return true
 		} else {
 			variable.ZapLog.Error("AuthSystemMenuModel 数据更新出错：", zap.Error(res.Error))
@@ -110,8 +112,8 @@ func (a *AuthSystemMenuModel) UpdateData(c *gin.Context) bool {
 	return false
 }
 
-// 更新path_info 、node_level 字段
-func (a *AuthSystemMenuModel) updatePathInfoNodeLevel(curItemid int) bool {
+// 新增、更新继续hook，更新path_info 、node_level 字段
+func (a *AuthSystemMenuModel) updatePathInfoNodeLevel(curItemid int64) bool {
 	sql := `
 		UPDATE tb_auth_system_menu a  LEFT JOIN tb_auth_system_menu  b
 		ON  a.fid=b.id

@@ -131,19 +131,20 @@ func (a *AuthSystemMenuButtonModel) UpdateHook(menuId int64) {
 
 	// 批量更新菜单被引用的所有地方
 	sql = `
-		UPDATE  tb_auth_casbin_rule e  LEFT  JOIN  (
-		SELECT  
-		DISTINCT
-		a.id,b.fr_auth_button_cn_en_id,b.request_method,b.request_url ,d.id AS   auth_post_mount_has_menu_button_id
-		FROM  tb_auth_system_menu  a,tb_auth_system_menu_button  b   ,
-		tb_auth_post_mount_has_menu  c,tb_auth_post_mount_has_menu_button  d
-		WHERE   a.id=b.fr_auth_system_menu_id
-		AND c.id=d.fr_auth_post_mount_has_menu_id
-		AND c.fr_auth_system_menu_id = a.id  AND   d.fr_auth_button_cn_en_id=b.fr_auth_button_cn_en_id
-		AND a.id=?  
-		)  AS   f  ON  e.fr_auth_post_mount_has_menu_button_id=f.auth_post_mount_has_menu_button_id
+		UPDATE   (
+			SELECT  
+			DISTINCT
+			a.id,b.fr_auth_button_cn_en_id,b.request_method,b.request_url ,d.id AS   auth_post_mount_has_menu_button_id
+			FROM  tb_auth_system_menu  a,tb_auth_system_menu_button  b   ,
+			tb_auth_post_mount_has_menu  c,tb_auth_post_mount_has_menu_button  d
+			WHERE   a.id=b.fr_auth_system_menu_id
+			AND c.id=d.fr_auth_post_mount_has_menu_id
+			AND c.fr_auth_system_menu_id = a.id  AND   d.fr_auth_button_cn_en_id=b.fr_auth_button_cn_en_id
+			AND a.id=? 
+		)  AS f LEFT  JOIN   tb_auth_casbin_rule e   ON  e.fr_auth_post_mount_has_menu_button_id=f.auth_post_mount_has_menu_button_id
 		SET  e.v1=f.request_url  ,  e.v2=f.request_method 
-		WHERE   f.auth_post_mount_has_menu_button_id  IS  NOT  NULL 
+		WHERE  e.ptype='p'  
+		AND  IFNULL( f.auth_post_mount_has_menu_button_id,0)>0
 		AND  LENGTH(IFNULL(f.request_url,''))>0 
 		AND   LENGTH(IFNULL(f.request_method,''))>0 
 		`
