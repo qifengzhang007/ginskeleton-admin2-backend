@@ -38,7 +38,7 @@ func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (list 
 		SELECT
 		id,  fid,name ,node_level ,status ,sort ,remark ,DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at , DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at
 		FROM tb_province_city 
-		WHERE   fid= ? AND   name LIKE  ? 
+		WHERE   fid= ? AND   name LIKE  ? ORDER  BY sort Desc, fid ASC ,id  ASC
 		LIMIT ? , ?;
 	`
 	if res := p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list); res.Error != nil {
