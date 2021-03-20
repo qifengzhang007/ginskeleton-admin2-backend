@@ -92,10 +92,8 @@ func (b *ButtonCnEnModel) InsertData(c *gin.Context) bool {
 func (b *ButtonCnEnModel) UpdateData(c *gin.Context) bool {
 	var tmp ButtonCnEnModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
-		tmp.CreatedAt = ""
-		if res := b.Updates(tmp); res.Error == nil {
-			return true
-		} else {
+		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
+		if res := b.Omit("CreatedAt").Save(tmp); res.Error == nil {
 			variable.ZapLog.Error("ButtonModel 数据修改出错", zap.Error(res.Error))
 		}
 	} else {

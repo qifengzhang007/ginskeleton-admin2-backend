@@ -98,8 +98,8 @@ func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuMo
 func (a *AuthSystemMenuModel) UpdateData(c *gin.Context) bool {
 	var tmp AuthSystemMenuModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
-		tmp.CreatedAt = ""
-		if res := a.Updates(tmp); res.Error == nil {
+		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
+		if res := a.Omit("CreatedAt").Save(tmp); res.Error == nil {
 			return true
 		} else {
 			variable.ZapLog.Error("AuthSystemMenuModel 数据更新出错：", zap.Error(res.Error))
