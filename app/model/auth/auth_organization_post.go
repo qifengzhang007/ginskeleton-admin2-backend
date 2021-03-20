@@ -14,10 +14,10 @@ func CreateAuthOrganizationFactory(sqlType string) *AuthOrganizationPostModel {
 
 type AuthOrganizationPostModel struct {
 	model.BaseModel
-	Fid      int    `gorm:"column:fid" json:"fid"`
-	Title    string `gorm:"column:title" json:"title"`
-	Status   int    `gorm:"column:status" json:"status"`
-	PathInfo string `gorm:"column:path_info" json:"path_info"`
+	Fid      int    `json:"fid"`
+	Title    string `json:"title"`
+	Status   int    `json:"status"`
+	PathInfo string `json:"path_info"`
 	Remark   string `json:"remark"`
 }
 
@@ -27,7 +27,7 @@ func (a *AuthOrganizationPostModel) TableName() string {
 }
 
 func (a *AuthOrganizationPostModel) GetCount(fid int, title string) (count int64) {
-	a.Model(a).Where("title like ?", "%"+title+"%").Where("fid = ?", fid).Count(&count)
+	a.Model(a).Select("id").Where("fid = ? AND title like ?", fid, "%"+title+"%").Count(&count)
 	return
 }
 func (a *AuthOrganizationPostModel) List(limitStart int, limit int, fid int, title string) (data []AuthOrganizationPostModel) {
@@ -72,7 +72,13 @@ func (a *AuthOrganizationPostModel) updatePathInfoNodeLevel(curItemid int) bool 
 }
 
 func (a *AuthOrganizationPostModel) GetByFid(fid int, data *[]AuthOrganizationPostTree) (err error) {
-	err = a.Model(a).Where("fid = ?", fid).Scan(data).Error
+	sql := `
+		SELECT  
+		id,fid,title, STATUS,path_info,remark ,
+		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_auth_organization_post  WHERE  fid=a.id ) AS  has_sub_node
+		FROM   tb_auth_organization_post  a  WHERE  fid=?
+	`
+	err = a.Raw(sql, fid).Scan(data).Error
 	return
 }
 
@@ -106,19 +112,17 @@ func (a *AuthOrganizationPostModel) DeleteData(id int) bool {
 	}
 	return false
 }
+func (a *AuthOrganizationPostModel) HasSubList(id int) (count int64) {
+	a.Model(a).Select("id").Count(&count)
+	return
+}
 
 func (a *AuthOrganizationPostModel) GetByIds(ids []int) (AuthOrganizationPostModel []AuthOrganizationPostModel) {
 	a.Where("id IN ?", ids).Find(&AuthOrganizationPostModel)
 	return
 }
 
-type AllAuth struct {
-	Id    int    `json:"id"`
-	Title string `json:"string"`
-	Fid   int    `json:"fid"`
-}
-
 func (a *AuthOrganizationPostModel) GetByIdsScan(ids []int) (AllAuth []AllAuth) {
-	a.Table(a.TableName()).Where("id IN ?", ids).Scan(&AllAuth)
+	a.Model(a).Select("id", "title", "fid").Where("id IN ?", ids).Scan(&AllAuth)
 	return
 }

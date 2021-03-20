@@ -12,6 +12,7 @@ import (
 	"goskeleton/app/http/validator/web/auth/org_post"
 	"goskeleton/app/http/validator/web/auth/post_members"
 	"goskeleton/app/http/validator/web/auth/system_menu"
+	"goskeleton/app/http/validator/web/province_city"
 	"goskeleton/app/http/validator/web/users"
 )
 
@@ -150,4 +151,20 @@ func RegisterValidator() {
 		key = consts.ValidatorPrefix + "ButtonDestroy"
 		containers.Set(key, button.ButtonDestroy{})
 	}
+
+	// 省份城市(province_city)
+	{
+		key = consts.ValidatorPrefix + "ProvinceCityList"
+		containers.Set(key, province_city.List{})
+		key = consts.ValidatorPrefix + "ProvinceCityCreate"
+		containers.Set(key, province_city.Create{})
+		key = consts.ValidatorPrefix + "ProvinceCityEdit"
+		containers.Set(key, province_city.Edit{})
+		key = consts.ValidatorPrefix + "ProvinceCityDestroy"
+		containers.Set(key, province_city.Destroy{})
+
+		key = consts.ValidatorPrefix + "ProvinceCitySubList"
+		containers.Set(key, province_city.SubList{})
+	}
+
 }

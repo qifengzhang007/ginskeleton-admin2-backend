@@ -11,10 +11,7 @@ func (a *AuthOrganizationPostService) GetOrgByFid(fid int) (err error, data []au
 	models := auth.CreateAuthOrganizationFactory("")
 	err = models.GetByFid(fid, &data)
 	for key, value := range data {
-		has := []auth.AuthOrganizationPostTree{}
-		id := value.Id
-		_ = models.GetByFid(id, &has)
-		if len(has) != 0 {
+		if value.HasSubNode > 0 {
 			value.Children = []auth.AuthOrganizationPostTree{}
 			data[key] = value
 		}

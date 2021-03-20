@@ -60,14 +60,12 @@ func (a *OrganizationPostController) Edit(c *gin.Context) {
 
 // 删除
 func (a *OrganizationPostController) Destroy(c *gin.Context) {
-	var err error
-	models := modeAuth.CreateAuthOrganizationFactory("")
 	id := c.GetFloat64(consts.ValidatorPrefix + "id")
+
+	models := modeAuth.CreateAuthOrganizationFactory("")
 	//判断是否有子节点,如果有,则禁止删除
-	var has []modeAuth.AuthOrganizationPostTree
-	err = models.GetByFid(int(id), &has)
-	if len(has) != 0 {
-		response.Fail(c, consts.CurdDeleteFailCode, "该节点下有子节点,禁止删除", err)
+	if models.HasSubList(int(id)) > 0 {
+		response.Fail(c, consts.CurdDeleteFailCode, "该节点下有子节点,禁止删除", "")
 	} else {
 		if models.DeleteData(int(id)) {
 			response.Success(c, consts.CurdStatusOkMsg, "")

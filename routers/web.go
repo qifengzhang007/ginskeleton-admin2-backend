@@ -162,6 +162,20 @@ func InitWebRouter() *gin.Engine {
 				// 删除
 				button.POST("destroy", validatorFactory.Create(consts.ValidatorPrefix+"ButtonDestroy"))
 			}
+			// 省份城市
+			provinceCity := backend.Group("province_city/")
+			{
+				// 查询
+				provinceCity.GET("list", validatorFactory.Create(consts.ValidatorPrefix+"ProvinceCityList"))
+				// 新增
+				provinceCity.POST("create", validatorFactory.Create(consts.ValidatorPrefix+"ProvinceCityCreate"))
+				// 更新
+				provinceCity.POST("edit", validatorFactory.Create(consts.ValidatorPrefix+"ProvinceCityEdit"))
+				// 删除
+				provinceCity.POST("destroy", validatorFactory.Create(consts.ValidatorPrefix+"ProvinceCityDestroy"))
+				// 根据id查询子级数据
+				provinceCity.GET("get_sublist", validatorFactory.Create(consts.ValidatorPrefix+"ProvinceCitySubList"))
+			}
 
 		}
 	}

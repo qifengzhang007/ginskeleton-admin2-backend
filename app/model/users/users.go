@@ -255,7 +255,7 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 			tmp.LastLoginIp = c.ClientIP()
 		}
 		// updates 不会处理零值字段，save 会全量覆盖式更新字段
-		if res := u.Updates(tmp); res.Error == nil {
+		if res := u.Omit("CreatedAt").Save(tmp); res.Error == nil {
 			if tmp.Pass != "" {
 				if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
 					return true
