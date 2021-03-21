@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
@@ -89,8 +90,9 @@ func (u *UsersModel) OauthResetToken(userId int64, newPass, clientIp string) boo
 	if userItem != nil && err == nil && userItem.Pass == newPass {
 		return true
 	} else if userItem != nil {
-		sql := "UPDATE  tb_oauth_access_tokens  SET  revoked=1,updated_at=NOW(),action_name='ResetPass',client_ip=?  WHERE  fr_user_id=?  "
-		if u.Exec(sql, clientIp, userId).Error == nil {
+		maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
+		sql := "UPDATE  tb_oauth_access_tokens  SET  revoked=1,updated_at=NOW(),action_name='ResetPass',client_ip=?  WHERE  fr_user_id=? AND revoked=0 ORDER BY id DESC LIMIT ?  "
+		if u.Exec(sql, clientIp, userId, maxOnlineUsers).Error == nil {
 			return true
 		}
 	}
@@ -255,15 +257,22 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 			tmp.LastLoginIp = c.ClientIP()
 		}
 		// updates 不会处理零值字段，save 会全量覆盖式更新字段
-		if res := u.Omit("CreatedAt").Save(tmp); res.Error == nil {
-			if tmp.Pass != "" {
-				if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
+		// omit 忽略指定字段
+		fmt.Printf("tmp:%+v\n", tmp)
+		if len(tmp.Pass) > 0 {
+			if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
+				if res := u.Omit("CreatedAt").Save(tmp); res.Error == nil {
 					return true
+				} else {
+					variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(res.Error))
 				}
 			}
-			return true
 		} else {
-			variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(err))
+			if res := u.Omit("CreatedAt", "Pass").Save(tmp); res.Error == nil {
+				return true
+			} else {
+				variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(res.Error))
+			}
 		}
 	}
 	return false
