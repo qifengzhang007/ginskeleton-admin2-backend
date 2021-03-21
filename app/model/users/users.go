@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
@@ -263,7 +262,6 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 		}
 		// updates 不会处理零值字段，save 会全量覆盖式更新字段
 		// omit 忽略指定字段
-		fmt.Printf("tmp:%+v\n", tmp)
 		if len(tmp.Pass) > 0 {
 			if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
 				if res := u.Omit("CreatedAt").Save(tmp); res.Error == nil {
