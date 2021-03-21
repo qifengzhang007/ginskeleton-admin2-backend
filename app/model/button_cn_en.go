@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
 	"goskeleton/app/utils/data_bind"
+	"strings"
 )
 
 func CreateButtonCnEnFactory(sqlType string) *ButtonCnEnModel {
@@ -77,6 +78,7 @@ func (a *ButtonCnEnModel) List(cnName string, limitStart, limit float64) (counts
 func (b *ButtonCnEnModel) InsertData(c *gin.Context) bool {
 	var tmp ButtonCnEnModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
+		tmp.AllowMethod = strings.ToUpper(tmp.AllowMethod)
 		if res := b.Create(&tmp); res.Error == nil {
 			return true
 		} else {
@@ -92,6 +94,7 @@ func (b *ButtonCnEnModel) InsertData(c *gin.Context) bool {
 func (b *ButtonCnEnModel) UpdateData(c *gin.Context) bool {
 	var tmp ButtonCnEnModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
+		tmp.AllowMethod = strings.ToUpper(tmp.AllowMethod)
 		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
 		if res := b.Omit("CreatedAt").Save(tmp); res.Error != nil {
 			variable.ZapLog.Error("ButtonModel 数据修改出错", zap.Error(res.Error))
