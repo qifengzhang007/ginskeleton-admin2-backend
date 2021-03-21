@@ -85,6 +85,12 @@ func (a *AuthPostMembersModel) UpdateData(c *gin.Context) bool {
 
 //删除
 func (a *AuthPostMembersModel) DeleteData(id float64) bool {
+	// 只能删除除了 admin 之外的用户
+	var count int64
+	a.Model(a).Select("fr_user_id").Where("id=?", id).First(&count)
+	if count == 1 {
+		return false
+	}
 	if res := a.Delete(a, id); res.Error == nil {
 		return true
 	} else {

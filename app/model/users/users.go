@@ -283,12 +283,25 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 
 //删除用户以及关联的token记录
 func (u *UsersModel) DeleteData(id int) bool {
+	if id == 1 {
+		// id 为 1 等于 admin 用户, 不能删除
+		return false
+	}
 	if u.Delete(u, id).Error == nil {
 		if u.OauthDestroyToken(id) {
+			go u.deleteDataHook(id)
 			return true
 		}
 	}
 	return false
+}
+
+// 删除用户后删除该用户的岗位挂接关系
+func (u *UsersModel) deleteDataHook(id int) {
+	sql := "DELETE   FROM  tb_auth_post_members WHERE fr_user_id=?"
+	if res := u.Exec(sql, id); res.Error != nil {
+		variable.ZapLog.Error("删除与用户相关的岗位成员表数据出错", zap.Error(res.Error))
+	}
 }
 
 // 权限分配查询（包含用户岗位信息）

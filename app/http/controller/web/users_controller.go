@@ -127,7 +127,7 @@ func (u *Users) Destroy(context *gin.Context) {
 	if users.CreateUserFactory("").DeleteData(int(userId)) {
 		response.Success(context, consts.CurdStatusOkMsg, "")
 	} else {
-		response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, "")
+		response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, "注意：admin 不能删除")
 	}
 }
 

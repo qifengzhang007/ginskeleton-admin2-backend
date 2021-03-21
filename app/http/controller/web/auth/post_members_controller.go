@@ -52,6 +52,6 @@ func (p *PostMembersController) Destroy(context *gin.Context) {
 	if modeAuth.CreateAuthPostMembersModelFactory("").DeleteData(id) {
 		response.Success(context, consts.CurdStatusOkMsg, "")
 	} else {
-		response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, "")
+		response.Fail(context, consts.CurdDeleteFailCode, consts.CurdDeleteFailMsg, " 只能删除 admin 之外的用户")
 	}
 }
