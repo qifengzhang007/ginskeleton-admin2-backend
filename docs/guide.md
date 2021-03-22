@@ -163,5 +163,5 @@ Status        *float64 `form:"status" json:"status" binding:"required,min=0"`
 ![本次我们分配给超级管理员岗位](https://www.ginskeleton.com/images/auth_assgined.jpg)  
 
 #### 9 最后,前端开发相关的页面即可  
-> 相关代码请打开前端项目，路径：src/view/button/index.vue , 参考编写即可.  
+> 相关代码请打开前端项目，路径：src/view/system_setting/button/index.vue , 参考编写即可.  
 > 由于前后端是一个整体，前端请按照前端开发指南进行开发项目.   
