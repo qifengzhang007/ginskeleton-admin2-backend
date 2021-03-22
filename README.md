@@ -1,4 +1,5 @@
-###    GinSkeleton-Admin (后端部分)  
+###    GinSkeleton-Admin (后端部分)
+![预览图](https://www.ginskeleton.com/images/home_page1.png)
 
 ### [在线演示地址: GinSkeleton-Admin](http://139.196.101.31:20202/)  
 
@@ -27,7 +28,9 @@
 > 用于将用户配置在组织机构树设置的岗位, 使用户与组织机构建立关联关系.  
 #### 5.权限分配： 
 >  权限可以分配给岗位、也可以分配给部门、甚至可以分配给公司,岗位会继承他的上一级部门的权限，部门会继续继承他的上一级公司的权限，而同一个岗位底下的用户则拥有该岗位以及继承后的所有权限.  
-![权限继承关系](https://www.ginskeleton.com/images/auth_extends.png)
+![权限继承关系](https://www.ginskeleton.com/images/auth_extends.png)  
+> 本系统超级管理员所在岗位：  
+![超级管理员](https://www.ginskeleton.com/images/auth_admin.jpg)
 #### 6.权限分析：
 >  由于我们以继承方式做权限的分配与管控，那么当用户的权限来源比较多的时候，无法很快定位权限来源, 此时你可以通过权限分析来定位它的来源.
 #### 7.按钮设置：
