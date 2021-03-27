@@ -57,13 +57,13 @@ func (a *AuthSystemMenuButtonModel) List(sysMenuId int) (counts int, data []Syst
 
 //新增
 func (a *AuthSystemMenuButtonModel) InsertData(data AuthSystemMenuButtonModel) bool {
-	a.Omit("CreatedAt,UpdatedAt").Create(&data)
+	a.Create(&data)
 	return true
 }
 
 // 更新
 func (a *AuthSystemMenuButtonModel) UpdateData(data AuthSystemMenuButtonModel) bool {
-	a.Updates(&data)
+	a.Omit("CreatedAt").Updates(&data)
 	return true
 }
 

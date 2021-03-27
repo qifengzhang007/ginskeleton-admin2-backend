@@ -8,6 +8,7 @@ import (
 	"goskeleton/app/model/auth"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AuthSystemMenuService struct {
@@ -65,6 +66,8 @@ func (a *AuthSystemMenuService) InsertButton(jsonStr string, menuId int64) bool 
 		data.Remark = v["remark"].(string)
 		data.RequestMethod = v["request_method"].(string)
 		data.RequestUrl = v["request_url"].(string)
+		data.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+		data.UpdatedAt = data.CreatedAt
 		auth.CreateAuthSystemMenuButtonFactory("").InsertData(data)
 	}
 	return true
@@ -91,6 +94,8 @@ func (a *AuthSystemMenuService) UpdateButton(jsonStr string, buttonDelete string
 		data.Id = int64(v["id"].(float64))
 		data.RequestMethod = v["request_method"].(string)
 		data.RequestUrl = v["request_url"].(string)
+		data.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+		data.UpdatedAt = data.CreatedAt
 		//开始逻辑判断,如果button_id = 0 ,则新增
 		if data.Id == 0 {
 			auth.CreateAuthSystemMenuButtonFactory("").InsertData(data)
