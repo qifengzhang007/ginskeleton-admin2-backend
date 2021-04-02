@@ -20,9 +20,10 @@ type MenuCreate struct {
 	Component    string   `form:"component" json:"component" binding:"min=1"`
 	Remark       string   `form:"remark" json:"remark"`
 	ButtonDelete string   `json:"button_delete"`
-	ButtonArray  `json:"buttonArray"`
+	ButtonArray  `json:"button_array"`
 }
 
+// 数据类型被使用时，shouldbindjson 对于数字是可以接受  int  int64   float64 ,shouldbind 函数对于数字只能接受  float64
 type ButtonArray []struct {
 	Id                 int64  `gorm:"primarykey" json:"id"`
 	FrAuthSystemMenuId int64  `json:"fr_auth_system_menu_id"`
