@@ -2,12 +2,12 @@ package auth_system_menu
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/qifengzhang007/sql_res_to_tree"
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
+	"goskeleton/app/http/validator/web/auth/system_menu/data_type"
 	"goskeleton/app/model/auth"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -57,55 +57,43 @@ func (a *AuthSystemMenuService) ButtonStringToArray(jsonStr string) []map[string
 
 //讲按钮循环加入表中
 //处理按钮字符串
-func (a *AuthSystemMenuService) InsertButton(jsonStr string, menuId int64) bool {
-	buttonArray := a.ButtonStringToArray(jsonStr)
-	for _, v := range buttonArray {
-		data := auth.AuthSystemMenuButtonModel{}
-		data.FrAuthButtonCnEnId = int(v["fr_auth_button_cn_en_id"].(float64))
-		data.FrAuthSystemMenuId = int(menuId)
-		data.Remark = v["remark"].(string)
-		data.RequestMethod = v["request_method"].(string)
-		data.RequestUrl = v["request_url"].(string)
-		data.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
-		data.UpdatedAt = data.CreatedAt
-		auth.CreateAuthSystemMenuButtonFactory("").InsertData(data)
+func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64) bool {
+	if menuButtonList, isOk := context.MustGet(variable.SystemCreateKey).(data_type.MenuCreate); isOk {
+		for index, item := range menuButtonList.ButtonArray {
+			item.FrAuthSystemMenuId = menuId
+			item.Status = 1
+			item.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+			item.UpdatedAt = item.CreatedAt
+			menuButtonList.ButtonArray[index] = item
+		}
+		if auth.CreateAuthSystemMenuButtonFactory("").InsertData(menuButtonList.ButtonArray) {
+			return true
+		}
 	}
-	return true
+	return false
 }
 
 //讲按钮循环加入表中
 //处理按钮字符串
-func (a *AuthSystemMenuService) UpdateButton(jsonStr string, buttonDelete string, menuId int64) bool {
-	buttonArray := a.ButtonStringToArray(jsonStr)
-	//取出需要删除的项目
-	buttonDeleteArr := strings.Split(buttonDelete, ",")
-	//循环删除
-	if len(buttonDeleteArr) != 0 {
-		for _, v := range buttonDeleteArr {
-			id, _ := strconv.Atoi(v)
-			auth.CreateAuthSystemMenuButtonFactory("").DeleteData(id)
+func (a *AuthSystemMenuService) UpdateButton(context *gin.Context, menuId int64) bool {
+	if menuButtonList, isOk := context.MustGet(variable.SystemEditKey).(data_type.MenuEdit); isOk {
+		//修改数据过程中可能存在单条数据被删除的情况，首先删除已标记的数据
+		if len(menuButtonList.ButtonDelete) > 0 {
+			auth.CreateAuthSystemMenuButtonFactory("").BatchDeleteData(menuButtonList.ButtonDelete)
+		}
+		for index, item := range menuButtonList.ButtonArray {
+			item.FrAuthSystemMenuId = menuId
+			item.Status = 1
+			item.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+			item.UpdatedAt = item.CreatedAt
+			menuButtonList.ButtonArray[index] = item
+		}
+		if auth.CreateAuthSystemMenuButtonFactory("").UpdateData(menuButtonList) {
+			go a.UpdateHook(menuId)
+			return true
 		}
 	}
-	for _, v := range buttonArray {
-		data := auth.AuthSystemMenuButtonModel{}
-		data.FrAuthButtonCnEnId = int(v["fr_auth_button_cn_en_id"].(float64))
-		data.FrAuthSystemMenuId = int(menuId)
-		data.Remark = v["remark"].(string)
-		data.Id = int64(v["id"].(float64))
-		data.RequestMethod = v["request_method"].(string)
-		data.RequestUrl = v["request_url"].(string)
-		data.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
-		data.UpdatedAt = data.CreatedAt
-		//开始逻辑判断,如果button_id = 0 ,则新增
-		if data.Id == 0 {
-			auth.CreateAuthSystemMenuButtonFactory("").InsertData(data)
-		} else {
-			auth.CreateAuthSystemMenuButtonFactory("").UpdateData(data)
-		}
-
-	}
-	go a.UpdateHook(menuId)
-	return true
+	return false
 }
 
 // 菜单挂接的待分配权限按钮数据被更新后，需要自动更新tb_auth_casbin_rule表数据

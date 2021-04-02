@@ -3,7 +3,9 @@ package auth
 import (
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
+	"goskeleton/app/http/validator/web/auth/system_menu/data_type"
 	"goskeleton/app/model"
+	"strconv"
 )
 
 func CreateAuthSystemMenuButtonFactory(sqlType string) *AuthSystemMenuButtonModel {
@@ -16,7 +18,7 @@ type AuthSystemMenuButtonModel struct {
 	FrAuthButtonCnEnId int    `json:"fr_auth_button_cn_en_id"`
 	RequestMethod      string `json:"request_method"`
 	RequestUrl         string `json:"request_url"`
-	Status             int    `gorm:"-" json:"status"`
+	Status             int    `json:"status"`
 	Remark             string `json:"remark"`
 }
 
@@ -26,7 +28,7 @@ func (a *AuthSystemMenuButtonModel) TableName() string {
 }
 
 func (a *AuthSystemMenuButtonModel) getCounts(sysMenuId int) (count int64) {
-	if res := a.Debug().Model(a).Where("fr_auth_system_menu_id=?", sysMenuId).Count(&count); res.Error == nil {
+	if res := a.Model(a).Where("fr_auth_system_menu_id=?", sysMenuId).Count(&count); res.Error == nil {
 		return count
 	}
 	return 0
@@ -56,14 +58,64 @@ func (a *AuthSystemMenuButtonModel) List(sysMenuId int) (counts int, data []Syst
 }
 
 //新增
-func (a *AuthSystemMenuButtonModel) InsertData(data AuthSystemMenuButtonModel) bool {
-	a.Create(&data)
+func (a *AuthSystemMenuButtonModel) InsertData(list data_type.ButtonArray) bool {
+
+	//注意: 这里必须使用  Table 函数指定表名
+	// 不能使用  a.Model(a) 设置表名，a.Model 函数会设置a上绑定的很多结构信息,这样就会导致与外部的数据类型 ButtonArray 不一致，最终 gorm 反射出错
+	if res := a.Table(a.TableName()).Create(&list); res.Error != nil {
+		variable.ZapLog.Error("系统菜单子表插入数据出错：", zap.Error(res.Error))
+		return false
+	}
 	return true
 }
 
 // 更新
-func (a *AuthSystemMenuButtonModel) UpdateData(data AuthSystemMenuButtonModel) bool {
-	a.Omit("CreatedAt").Updates(&data)
+func (a *AuthSystemMenuButtonModel) UpdateData(menuEdit data_type.MenuEdit) bool {
+
+	// 删除可能存在的垃圾数据(由于开发测试阶段可能存储手动添加的测试、忘记删除最终会导致权限出现异常)
+	var list = menuEdit.ButtonArray
+
+	var newIds string
+	for _, item := range list {
+		if item.Id > 0 {
+			newIds += strconv.Itoa(int(item.Id)) + ","
+		}
+	}
+	sql := `DELETE  FROM   tb_auth_system_menu_button  WHERE  fr_auth_system_menu_id=? AND !FIND_IN_SET(id,?) `
+	if res := a.Exec(sql, menuEdit.Id, newIds); res.Error != nil {
+		variable.ZapLog.Error("删除可能的垃圾数据出错：", zap.Error(res.Error))
+		return false
+	}
+
+	for index, item := range list {
+		if item.Id > 0 {
+			if res := a.Table(a.TableName()).Omit("CreatedAt").Save(&item); res.Error != nil {
+				list[index] = item
+				return false
+			}
+		} else {
+			// 如果 id 为 0 表示修改的过程中新增了数据
+			sql := `
+				INSERT   INTO tb_auth_system_menu_button(fr_auth_system_menu_id,fr_auth_button_cn_en_id,request_url,request_method,status,remark,created_at,updated_at)
+				SELECT ?,?,?,?,1,?,?,? FROM  DUAL  WHERE  NOT  EXISTS(
+				SELECT 1 FROM  tb_auth_system_menu_button a WHERE  a.fr_auth_system_menu_id=?  AND  a.fr_auth_button_cn_en_id=? AND  a.status=1  FOR  UPDATE
+				)
+			`
+			if res := a.Exec(sql, item.FrAuthSystemMenuId, item.FrAuthButtonCnEnId, item.RequestUrl, item.RequestMethod, item.Remark, item.CreatedAt, item.UpdatedAt, item.FrAuthSystemMenuId, item.FrAuthButtonCnEnId); res.Error != nil {
+				variable.ZapLog.Error("修改界面ID未生成，新增了数据，执行sql出错：", zap.Error(res.Error))
+				return false
+			} else {
+				sql = `
+					UPDATE tb_auth_system_menu_button  SET  request_url=?,request_method=?,remark=?  WHERE  fr_auth_system_menu_id=? AND fr_auth_button_cn_en_id=?
+				`
+				if res = a.Exec(sql, item.RequestUrl, item.RequestMethod, item.Remark, item.FrAuthSystemMenuId, item.FrAuthButtonCnEnId); res.Error != nil {
+					variable.ZapLog.Error("修改界面ID未生成，针对已输入文本继续做了修改，执行sql出错：", zap.Error(res.Error))
+					return false
+				}
+			}
+			list[index] = item
+		}
+	}
 	return true
 }
 
@@ -73,6 +125,17 @@ func (a *AuthSystemMenuButtonModel) DeleteData(id int) bool {
 		return true
 	} else {
 		variable.ZapLog.Error("AuthSystemMenuButtonModel 数据删除失败", zap.Error(res.Error))
+	}
+	return false
+}
+
+// 批量删除数据
+func (a *AuthSystemMenuButtonModel) BatchDeleteData(ids string) bool {
+	sql := `DELETE  FROM tb_auth_system_menu_button  WHERE  FIND_IN_SET(id,?)  `
+	if res := a.Exec(sql, ids); res.Error == nil {
+		return true
+	} else {
+		variable.ZapLog.Error("AuthSystemMenuButtonModel 批量数据删除失败", zap.Error(res.Error))
 	}
 	return false
 }

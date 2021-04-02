@@ -5,11 +5,12 @@ import (
 	"goskeleton/app/global/consts"
 	"goskeleton/app/http/controller/web/auth"
 	"goskeleton/app/http/validator/core/data_transfer"
+	"goskeleton/app/http/validator/web/auth/system_menu/data_type"
 	"goskeleton/app/utils/response"
 )
 
 type SystemMenuDestroy struct {
-	Id
+	data_type.Id
 }
 
 // 验证器语法，参见 Register.go文件，有详细说明

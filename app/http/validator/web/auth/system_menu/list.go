@@ -6,12 +6,13 @@ import (
 	"goskeleton/app/http/controller/web/auth"
 	"goskeleton/app/http/validator/core/data_transfer"
 	"goskeleton/app/http/validator/web/auth/common_data_type"
+	"goskeleton/app/http/validator/web/auth/system_menu/data_type"
 	"goskeleton/app/utils/response"
 )
 
 type SystemMenuList struct {
 	Title string `form:"title" json:"title"`
-	Fid
+	data_type.Fid
 	common_data_type.Page
 }
 

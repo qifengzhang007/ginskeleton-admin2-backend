@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qifengzhang007/sql_res_to_tree"
 	"go.uber.org/zap"
@@ -83,6 +84,7 @@ func (a *AuthSystemMenuModel) GetByFid(fid int, data *[]AuthSystemMenuTree) (err
 func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuModel) {
 	var tmp AuthSystemMenuModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
+		fmt.Printf("主表数据：%+v\n", tmp)
 		var counts int64
 		if res := a.Model(a).Where("fid=? AND  title=?", tmp.Fid, tmp.Title).Count(&counts); res.Error == nil && counts == 0 {
 			if res := a.Create(&tmp); res.Error == nil {

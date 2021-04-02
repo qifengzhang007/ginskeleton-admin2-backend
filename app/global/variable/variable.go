@@ -38,7 +38,8 @@ var (
 	Enforcer *casbin.SyncedEnforcer
 
 	//  用户自行定义其他全局变量 ↓
-
+	SystemCreateKey = "system_menu_create" // 系统菜单数据编辑界面用户以 raw 格式提交的 json 存储在上下文的键
+	SystemEditKey   = "system_menu_edit"
 )
 
 func init() {

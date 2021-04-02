@@ -37,7 +37,7 @@ func ShouldBindFormDataToModel(c *gin.Context, modelStrcut interface{}) error {
 	return nil
 }
 
-// 分析匿名结构体,并且获取匿名结构体的值
+// 分析结构体（包括匿名的）,并且获取结构体的值
 func analysisAnonymousStruct(c *gin.Context, value reflect.Value) reflect.Value {
 
 	typeOf := value.Type()

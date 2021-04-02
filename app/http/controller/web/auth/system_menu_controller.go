@@ -47,29 +47,27 @@ func (a *SystemMenuController) GetMountButtonList(c *gin.Context) {
 
 // 1.新增
 func (a *SystemMenuController) Create(c *gin.Context) {
-	exists, data := modeAuth.CreateAuthSystemMenuFactory("").InsertData(c)
-	if exists {
-		//菜单入库成功后,处理按钮信息
-		buttonString := c.GetString(consts.ValidatorPrefix + "button_string")
-		(&auth_system_menu.AuthSystemMenuService{}).InsertButton(buttonString, data.Id)
-		response.Success(c, consts.CurdStatusOkMsg, consts.CurdStatusOkCode)
-	} else {
-		response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg+"请注意不要添加重复数据", "")
+	isOk, data := modeAuth.CreateAuthSystemMenuFactory("").InsertData(c)
+	if isOk {
+		if (&auth_system_menu.AuthSystemMenuService{}).InsertButton(c, data.Id) {
+			response.Success(c, consts.CurdStatusOkMsg, consts.CurdStatusOkCode)
+			return
+		}
 	}
+	response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg, "请注意不要添加重复数据")
 }
 
 // 1.修改
 func (a *SystemMenuController) Edit(c *gin.Context) {
 	res := modeAuth.CreateAuthSystemMenuFactory("").UpdateData(c)
 	if res {
-		buttonString := c.GetString(consts.ValidatorPrefix + "button_string")
-		buttonDelete := c.GetString(consts.ValidatorPrefix + "button_delete")
 		menuId := c.GetFloat64(consts.ValidatorPrefix + "id")
-		(&auth_system_menu.AuthSystemMenuService{}).UpdateButton(buttonString, buttonDelete, int64(menuId))
-		response.Success(c, consts.CurdStatusOkMsg, consts.CurdStatusOkCode)
-	} else {
-		response.Fail(c, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg, "无数据被修改")
+		if (&auth_system_menu.AuthSystemMenuService{}).UpdateButton(c, int64(menuId)) {
+			response.Success(c, consts.CurdStatusOkMsg, consts.CurdStatusOkCode)
+			return
+		}
 	}
+	response.Fail(c, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg, "无数据被修改")
 }
 
 // 1.删除
