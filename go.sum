@@ -312,8 +312,8 @@ github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7z
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/qifengzhang007/goCurl v1.2.8 h1:jwQ6QX6hVpXW0pT29eEXXuRxScvlQRk2ZgiZfg+UPu0=
 github.com/qifengzhang007/goCurl v1.2.8/go.mod h1:TsF+sLU+snpIwZZvCafoktfd1788YbLG/hIrp6WpW6I=
-github.com/qifengzhang007/sql_res_to_tree v1.0.8 h1:u0Y9QRh+PBP3Lms1xSnqyEgmHQ1iTlyap6PoAJwZGfk=
-github.com/qifengzhang007/sql_res_to_tree v1.0.8/go.mod h1:GWGWedG/Bo0Ni9TRpLGBGemucjEEOn+D/aIi+pEkSfo=
+github.com/qifengzhang007/sql_res_to_tree v1.0.9 h1:rEvkLvs1ep8Lx4lFAjwbQeBJsyhfptns3XMSDUwyuz8=
+github.com/qifengzhang007/sql_res_to_tree v1.0.9/go.mod h1:GWGWedG/Bo0Ni9TRpLGBGemucjEEOn+D/aIi+pEkSfo=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
