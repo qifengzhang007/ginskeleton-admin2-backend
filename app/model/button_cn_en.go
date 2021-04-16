@@ -38,7 +38,7 @@ func (b *ButtonCnEnModel) getCounts(keyWords string) (counts int64) {
 }
 
 // 查询（根据关键词模糊查询）
-func (b *ButtonCnEnModel) Show(keyWords string, limitStart int, limitItems int) (totalCounts int64, temp []ButtonCnEnModel) {
+func (b *ButtonCnEnModel) Show(keyWords string, limitStart, limitItems int) (totalCounts int64, temp []ButtonCnEnModel) {
 	totalCounts = b.getCounts(keyWords)
 	if totalCounts > 0 {
 		sql := "SELECT  `id`, `cn_name`,`allow_method`, `en_name`, `remark`,DATE_FORMAT(created_at,'%Y-%m-%d %h:%i:%s')  AS created_at," +
@@ -61,12 +61,12 @@ func (a *ButtonCnEnModel) getCountsByButtonName(cnName string) (count int64) {
 	return 0
 }
 
-func (a *ButtonCnEnModel) List(cnName string, limitStart, limit float64) (counts int64, data []ButtonCnEnModel) {
+func (a *ButtonCnEnModel) List(cnName string, limitStart, limit int) (counts int64, data []ButtonCnEnModel) {
 	counts = a.getCountsByButtonName(cnName)
 	if counts > 0 {
 		if err := a.Model(a).
 			Select("id", "en_name", "cn_name", "allow_method", "color", "status", "cn_name", "remark", "DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at", "DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at").
-			Where("cn_name like ?", "%"+cnName+"%").Offset(int(limitStart)).Limit(int(limit)).Find(&data); err.Error == nil {
+			Where("cn_name like ?", "%"+cnName+"%").Offset(limitStart).Limit(limit).Find(&data); err.Error == nil {
 			return
 		}
 	}

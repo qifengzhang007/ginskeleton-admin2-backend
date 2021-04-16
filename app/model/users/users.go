@@ -175,7 +175,7 @@ func (u *UsersModel) getPostListCounts(nameKeyWords, orgPostName string) (counts
 }
 
 // 查询（根据关键词模糊查询）
-func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limitItems float64) (totalCounts int64, temp []OrgPostList) {
+func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limitItems int) (totalCounts int64, temp []OrgPostList) {
 	totalCounts = u.getPostListCounts(nameKeyWords, orgPostName)
 	if totalCounts > 0 {
 		sql := `
@@ -187,7 +187,7 @@ func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limi
 			LEFT  JOIN  tb_auth_organization_post  c  ON b.fr_auth_organization_post_id=c.id
 			WHERE ( a.real_name  LIKE  ? or a.user_name  like ?)  AND   IFNULL( c.title,'')   LIKE  ?  limit  ?,?
 			`
-		if res := u.Raw(sql, "%"+nameKeyWords+"%", "%"+nameKeyWords+"%", "%"+orgPostName+"%", int(limitStart), int(limitItems)).Find(&temp); res.RowsAffected > 0 {
+		if res := u.Raw(sql, "%"+nameKeyWords+"%", "%"+nameKeyWords+"%", "%"+orgPostName+"%", limitStart, limitItems).Find(&temp); res.RowsAffected > 0 {
 			return totalCounts, temp
 		} else {
 			return totalCounts, nil
@@ -207,7 +207,7 @@ func (u *UsersModel) getCounts(userName string) (counts int64) {
 }
 
 // 查询（根据关键词模糊查询）
-func (u *UsersModel) List(userName string, limitStart float64, limitItems float64) (totalCounts int64, list []UsersModel) {
+func (u *UsersModel) List(userName string, limitStart, limitItems int) (totalCounts int64, list []UsersModel) {
 	totalCounts = u.getCounts(userName)
 	if totalCounts > 0 {
 		sql := `
@@ -305,7 +305,7 @@ func (u *UsersModel) deleteDataHook(id int) {
 }
 
 // 权限分配查询（包含用户岗位信息）
-func (u *UsersModel) ListWithPost(userName string, limitStart float64, limitItems float64) (totalCounts int64, list []AnalysisiUserList) {
+func (u *UsersModel) ListWithPost(userName string, limitStart, limitItems int) (totalCounts int64, list []AnalysisiUserList) {
 	totalCounts = u.getCounts(userName)
 	if totalCounts > 0 {
 		sql := `
