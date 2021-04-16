@@ -64,10 +64,10 @@
 
 ### 版本更新日志
 
-#### V1.0.11 (2021-04-16)
-> 1.修复bug:在mysql8高版本系列，limit 后面的参数是浮点型查询不到数据。
-> 2.更新自带数据库，修改oauth_token表的token字段长度为600.  
-> 3.更新sql结果树形化包版本，以便支持更多负责的sql查询结果树形化.
+#### V1.0.11 (2021-04-16)  
+> 1.修复bug:在mysql8高版本系列，limit 后面的参数是浮点型查询不到数据。  
+> 2.更新自带数据库，修改oauth_token表的token字段长度为600.   
+> 3.更新sql结果树形化包版本，以便支持更多复杂的sql查询结果树形化.  
 
 #### V1.0.10 (2021-04-02)
 > 1.系统菜单主表与子表数据接受方式以及后续的总体逻辑更新.  
@@ -75,9 +75,9 @@
 #### V1.0.01 (2021-03-27)  
 > Bug修复:  
 > 1.系统菜单添加按钮失败的错误.  
-1.1 涉及到的文件：app/model/auth/auth_system_menu_button.go  
-1.2 app/service/auth_system_menu/auth_organization_post_service.go  
-2.快速升级、更新的办法：可直接使用官方仓库最新代码覆盖自带代码即可.  
+1.1 涉及到的文件：app/model/auth/auth_system_menu_button.go   
+1.2 app/service/auth_system_menu/auth_organization_post_service.go   
+2.快速升级、更新的办法：可直接使用官方仓库最新代码覆盖自带代码即可.   
 
 ####    V1.0.00 (2021-03-20)
 > 1.GinSkeleton-Admin 系统 v1.0.0 版本发布. 
