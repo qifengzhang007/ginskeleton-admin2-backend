@@ -73,7 +73,7 @@ func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64
 		"SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  `tb_oauth_access_tokens` a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?)"
 	//注意：token的精确度为秒，如果在一秒之内，一个账号多次调用接口生成的token其实是相同的，这样写入数据库，第二次的影响行数为0，知己实际上操作仍然是有效的。
 	//所以这里的判断影响行数>=0 都是正确的，只有 -1 才是执行失败、错误
-	if u.Exec(sql, userId, token, time.Unix(expiresAt, 0).Format("2006-01-02 15:04:05"), clientIp, userId, token).Error == nil {
+	if u.Exec(sql, userId, token, time.Unix(expiresAt, 0).Format(variable.DateFormart), clientIp, userId, token).Error == nil {
 		return true
 	}
 	return false
@@ -81,8 +81,8 @@ func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64
 
 //用户刷新token
 func (u *UsersModel) OauthRefreshToken(userId, expiresAt int64, oldToken, newToken, clientIp string) bool {
-	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=FROM_UNIXTIME(?),client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
-	if u.Exec(sql, newToken, expiresAt, clientIp, userId, oldToken).Error == nil {
+	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
+	if u.Exec(sql, newToken, time.Unix(expiresAt, 0).Format(variable.DateFormart), clientIp, userId, oldToken).Error == nil {
 		return true
 	}
 	return false
