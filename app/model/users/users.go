@@ -180,8 +180,8 @@ func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limi
 	if totalCounts > 0 {
 		sql := `
 			SELECT  a.id, a.user_name, a.real_name,a.phone, a.status,a.last_login_ip,a.remark,a.login_times,
-			DATE_FORMAT(a.created_at,'%Y-%m-%d %h:%i:%s')  AS created_at,
-			DATE_FORMAT(a.updated_at,'%Y-%m-%d %h:%i:%s')  AS updated_at,  
+			DATE_FORMAT(a.created_at,'%Y-%m-%d %H:%i:%s')  AS created_at,
+			DATE_FORMAT(a.updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at,  
 			c.id AS org_post_id, c.title AS  org_post_name FROM tb_users  a 
 			LEFT  JOIN  tb_auth_post_members  b  ON  a.id=b.fr_user_id
 			LEFT  JOIN  tb_auth_organization_post  c  ON b.fr_auth_organization_post_id=c.id
@@ -212,7 +212,7 @@ func (u *UsersModel) List(userName string, limitStart float64, limitItems float6
 	if totalCounts > 0 {
 		sql := `
 			SELECT  a.id, a.user_name, a.real_name,a.avatar, a.phone, a.status,a.last_login_ip,a.remark,a.login_times,
-			DATE_FORMAT(created_at,'%Y-%m-%d %h:%i:%s')  AS created_at,	DATE_FORMAT(updated_at,'%Y-%m-%d %h:%i:%s')  AS updated_at  
+			DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  AS created_at,	DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at  
 			 FROM  tb_users a WHERE  ( user_name LIKE ? OR real_name LIKE  ?) LIMIT ?,?
 			`
 		if res := u.Raw(sql, "%"+userName+"%", "%"+userName+"%", limitStart, limitItems).Find(&list); res.RowsAffected > 0 {
