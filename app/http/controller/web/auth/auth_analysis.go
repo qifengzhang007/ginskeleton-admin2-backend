@@ -20,7 +20,7 @@ func (a *AuthAnalysis) ListWithPost(context *gin.Context) {
 	limit := context.GetFloat64(consts.ValidatorPrefix + "limit")
 	limitStart := (page - 1) * limit
 
-	totalCounts, showList := users.CreateUserFactory("").ListWithPost(userName, limitStart, limit)
+	totalCounts, showList := users.CreateUserFactory("").ListWithPost(userName, int(limitStart), int(limit))
 	if totalCounts > 0 && showList != nil {
 		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": totalCounts, "data": showList})
 	} else {

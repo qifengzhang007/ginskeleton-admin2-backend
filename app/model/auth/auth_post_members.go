@@ -35,7 +35,7 @@ func (a *AuthPostMembersModel) GetCount(postId float64, userName string) (count 
 	a.Raw(sql, postId, postId, "%"+userName+"%", "%"+userName+"%").First(&count)
 	return
 }
-func (a *AuthPostMembersModel) List(postId, limitStart, limits float64, userName string) (data []MemberList) {
+func (a *AuthPostMembersModel) List(postId, limitStart, limits int, userName string) (data []MemberList) {
 	sql := `SELECT  a.id, a.fr_auth_organization_post_id AS org_post_id, a.fr_user_id AS user_id,b.user_name,b.real_name,a.status,c.title AS post_name, a.remark, 
 			DATE_FORMAT(a.created_at,'%Y-%m-%d %h:%i:%s')  AS created_at, DATE_FORMAT(a.updated_at,'%Y-%m-%d %h:%i:%s')  AS updated_at  
 			FROM    tb_auth_post_members  a,tb_users  b   ,tb_auth_organization_post  c
