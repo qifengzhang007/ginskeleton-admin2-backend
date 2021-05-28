@@ -8,6 +8,7 @@ import (
 	"goskeleton/app/utils/data_bind"
 	"goskeleton/app/utils/md5_encrypt"
 	"strings"
+	"time"
 )
 
 // 创建 userFactory
@@ -69,10 +70,10 @@ func (u *UsersModel) Login(userName string, pass string) *UsersModel {
 //记录用户登陆（login）生成的token，每次登陆记录一次token
 func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64, clientIp string) bool {
 	sql := "INSERT   INTO  `tb_oauth_access_tokens`(fr_user_id,`action_name`,token,expires_at,client_ip) " +
-		"SELECT  ?,'login',? ,FROM_UNIXTIME(?),? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  `tb_oauth_access_tokens` a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?)"
+		"SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  `tb_oauth_access_tokens` a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?)"
 	//注意：token的精确度为秒，如果在一秒之内，一个账号多次调用接口生成的token其实是相同的，这样写入数据库，第二次的影响行数为0，知己实际上操作仍然是有效的。
 	//所以这里的判断影响行数>=0 都是正确的，只有 -1 才是执行失败、错误
-	if u.Exec(sql, userId, token, expiresAt, clientIp, userId, token).Error == nil {
+	if u.Exec(sql, userId, token, time.Unix(expiresAt, 0).Format(variable.DateFormart), clientIp, userId, token).Error == nil {
 		return true
 	}
 	return false
@@ -80,8 +81,8 @@ func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64
 
 //用户刷新token
 func (u *UsersModel) OauthRefreshToken(userId, expiresAt int64, oldToken, newToken, clientIp string) bool {
-	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=FROM_UNIXTIME(?),client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
-	if u.Exec(sql, newToken, expiresAt, clientIp, userId, oldToken).Error == nil {
+	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
+	if u.Exec(sql, newToken, time.Unix(expiresAt, 0).Format(variable.DateFormart), clientIp, userId, oldToken).Error == nil {
 		return true
 	}
 	return false
@@ -175,19 +176,19 @@ func (u *UsersModel) getPostListCounts(nameKeyWords, orgPostName string) (counts
 }
 
 // 查询（根据关键词模糊查询）
-func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limitItems float64) (totalCounts int64, temp []OrgPostList) {
+func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limitItems int) (totalCounts int64, temp []OrgPostList) {
 	totalCounts = u.getPostListCounts(nameKeyWords, orgPostName)
 	if totalCounts > 0 {
 		sql := `
 			SELECT  a.id, a.user_name, a.real_name,a.phone, a.status,a.last_login_ip,a.remark,a.login_times,
-			DATE_FORMAT(a.created_at,'%Y-%m-%d %h:%i:%s')  AS created_at,
-			DATE_FORMAT(a.updated_at,'%Y-%m-%d %h:%i:%s')  AS updated_at,  
+			DATE_FORMAT(a.created_at,'%Y-%m-%d %H:%i:%s')  AS created_at,
+			DATE_FORMAT(a.updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at,  
 			c.id AS org_post_id, c.title AS  org_post_name FROM tb_users  a 
 			LEFT  JOIN  tb_auth_post_members  b  ON  a.id=b.fr_user_id
 			LEFT  JOIN  tb_auth_organization_post  c  ON b.fr_auth_organization_post_id=c.id
 			WHERE ( a.real_name  LIKE  ? or a.user_name  like ?)  AND   IFNULL( c.title,'')   LIKE  ?  limit  ?,?
 			`
-		if res := u.Raw(sql, "%"+nameKeyWords+"%", "%"+nameKeyWords+"%", "%"+orgPostName+"%", int(limitStart), int(limitItems)).Find(&temp); res.RowsAffected > 0 {
+		if res := u.Raw(sql, "%"+nameKeyWords+"%", "%"+nameKeyWords+"%", "%"+orgPostName+"%", limitStart, limitItems).Find(&temp); res.RowsAffected > 0 {
 			return totalCounts, temp
 		} else {
 			return totalCounts, nil
@@ -207,12 +208,12 @@ func (u *UsersModel) getCounts(userName string) (counts int64) {
 }
 
 // 查询（根据关键词模糊查询）
-func (u *UsersModel) List(userName string, limitStart float64, limitItems float64) (totalCounts int64, list []UsersModel) {
+func (u *UsersModel) List(userName string, limitStart, limitItems int) (totalCounts int64, list []UsersModel) {
 	totalCounts = u.getCounts(userName)
 	if totalCounts > 0 {
 		sql := `
 			SELECT  a.id, a.user_name, a.real_name,a.avatar, a.phone, a.status,a.last_login_ip,a.remark,a.login_times,
-			DATE_FORMAT(created_at,'%Y-%m-%d %h:%i:%s')  AS created_at,	DATE_FORMAT(updated_at,'%Y-%m-%d %h:%i:%s')  AS updated_at  
+			DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  AS created_at,	DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at  
 			 FROM  tb_users a WHERE  ( user_name LIKE ? OR real_name LIKE  ?) LIMIT ?,?
 			`
 		if res := u.Raw(sql, "%"+userName+"%", "%"+userName+"%", limitStart, limitItems).Find(&list); res.RowsAffected > 0 {
@@ -305,7 +306,7 @@ func (u *UsersModel) deleteDataHook(id int) {
 }
 
 // 权限分配查询（包含用户岗位信息）
-func (u *UsersModel) ListWithPost(userName string, limitStart float64, limitItems float64) (totalCounts int64, list []AnalysisiUserList) {
+func (u *UsersModel) ListWithPost(userName string, limitStart, limitItems int) (totalCounts int64, list []AnalysisiUserList) {
 	totalCounts = u.getCounts(userName)
 	if totalCounts > 0 {
 		sql := `

@@ -18,7 +18,7 @@ func (s *Button) List(context *gin.Context) {
 	limit := context.GetFloat64(consts.ValidatorPrefix + "limit")
 	limitStart := (page - 1) * limit
 
-	totalCounts, showList := model.CreateButtonCnEnFactory("").List(buttonName, limitStart, limit)
+	totalCounts, showList := model.CreateButtonCnEnFactory("").List(buttonName, int(limitStart), int(limit))
 	if totalCounts > 0 && showList != nil {
 		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": totalCounts, "data": showList})
 	} else {

@@ -46,7 +46,7 @@ func (u *Users) Login(context *gin.Context) {
 					"realName":   userModel.RealName,
 					"phone":      phone,
 					"token":      userToken,
-					"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+					"updated_at": time.Now().Format(variable.DateFormart),
 				}
 				response.Success(context, consts.CurdStatusOkMsg, data)
 				return
@@ -76,7 +76,7 @@ func (u *Users) List(context *gin.Context) {
 	limit := context.GetFloat64(consts.ValidatorPrefix + "limit")
 	limitStart := (page - 1) * limit
 
-	totalCounts, showList := users.CreateUserFactory("").List(userName, limitStart, limit)
+	totalCounts, showList := users.CreateUserFactory("").List(userName, int(limitStart), int(limit))
 	if totalCounts > 0 && showList != nil {
 		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": totalCounts, "data": showList})
 	} else {
@@ -92,7 +92,7 @@ func (u *Users) PostList(context *gin.Context) {
 	limit := context.GetFloat64(consts.ValidatorPrefix + "limit")
 	limitStart := (page - 1) * limit
 
-	totalCounts, postList := users.CreateUserFactory("").PostList(userName, orgPostName, limitStart, limit)
+	totalCounts, postList := users.CreateUserFactory("").PostList(userName, orgPostName, int(limitStart), int(limit))
 	if totalCounts > 0 && postList != nil {
 		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": totalCounts, "data": postList})
 	} else {

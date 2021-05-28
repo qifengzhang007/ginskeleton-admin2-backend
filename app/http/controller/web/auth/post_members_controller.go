@@ -20,7 +20,7 @@ func (p *PostMembersController) List(context *gin.Context) {
 	postMemberFac := modeAuth.CreateAuthPostMembersModelFactory("")
 	counts := postMemberFac.GetCount(orgPostId, userName)
 	if counts > 0 {
-		res := postMemberFac.List(orgPostId, limitStart, limit, userName)
+		res := postMemberFac.List(int(orgPostId), int(limitStart), int(limit), userName)
 		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": counts, "data": res})
 		return
 	}
