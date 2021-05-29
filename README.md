@@ -64,6 +64,12 @@
 
 ### 版本更新日志
 
+#### V1.0.16 (2021-05-28)
+> 1.针对小权限账号启动本项目时，涉及到文件上传，自动创建目录时，调整文件夹权限为 os.ModePerm.  
+
+#### V1.0.15 (2021-05-12)
+> 1.修复数据查询时间格式化书写错误的bug,mysql日期时间格式化由 %Y-%m-%d %h:%i:%s 修复为 ：%Y-%m-%d %H:%i:%s ，由于 %h 小写导致了时间比实际滞后8小时.
+
 #### V1.0.14 (2021-05-04)
 > 1.cobra增加创建子目录的示例代码.  
 
@@ -84,9 +90,9 @@
 #### V1.0.01 (2021-03-27)  
 > Bug修复:  
 > 1.系统菜单添加按钮失败的错误.  
-1.1 涉及到的文件：app/model/auth/auth_system_menu_button.go   
-1.2 app/service/auth_system_menu/auth_organization_post_service.go   
-2.快速升级、更新的办法：可直接使用官方仓库最新代码覆盖自带代码即可.   
+1.1 涉及到的文件：app/model/auth/auth_system_menu_button.go  
+1.2 app/service/auth_system_menu/auth_organization_post_service.go  
+2.快速升级、更新的办法：可直接使用官方仓库最新代码覆盖自带代码即可.  
 
 ####    V1.0.00 (2021-03-20)
 > 1.GinSkeleton-Admin 系统 v1.0.0 版本发布. 
