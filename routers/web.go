@@ -67,7 +67,7 @@ func InitWebRouter() *gin.Engine {
 			// 2.将以上表单参数验证器注册，遵守 键 =》值 格式注册即可 ，app/http/validator/common/register_validator/register_validator.go  20行就是注册时候的键 consts.ValidatorPrefix+"UsersRegister"
 			// 3.按照注册时的键，直接从容器调用即可 ：validatorFactory.Create(consts.ValidatorPrefix+"UsersRegister")
 			//noAuth.POST("register", validatorFactory.Create(consts.ValidatorPrefix+"UsersRegister")) // 将公开注册渠道关闭
-			noAuth.POST("login", validatorFactory.Create(consts.ValidatorPrefix+"UsersLogin"))
+			noAuth.Use(authorization.CheckCaptchaAuth()).POST("login", validatorFactory.Create(consts.ValidatorPrefix+"UsersLogin"))
 		}
 
 		// 【需要token】中间件验证的路由

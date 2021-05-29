@@ -11,7 +11,7 @@ import (
 type Login struct {
 	UserName
 	Pass
-	Captcha string `form:"captcha" json:"captcha"` //  验证码 ,如果不需要任何校验，删除 binding 标签即可
+	//Captcha string `form:"captcha" json:"captcha"` //  验证码 ,如果不需要任何校验，删除 binding 标签即可
 }
 
 // 验证器语法，参见 Register.go文件，有详细说明
