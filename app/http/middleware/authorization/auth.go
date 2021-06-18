@@ -28,6 +28,7 @@ func CheckTokenAuth() gin.HandlerFunc {
 		if err := context.ShouldBindHeader(&headerParams); err != nil {
 			variable.ZapLog.Error(my_errors.ErrorsValidatorBindParamsFail, zap.Error(err))
 			context.Abort()
+			return
 		}
 
 		if len(headerParams.Authorization) >= 20 {
