@@ -13,7 +13,7 @@ import (
 
 type WithPosUsertList struct {
 	UserName
-	OrgPostName string `form:"org_post_name" json:"org_post_name"` // 必填，页面值>0
+	OrgPostName string `form:"org_post_name"` // 必填，页面值>0
 	common_data_type.Page
 }
 
