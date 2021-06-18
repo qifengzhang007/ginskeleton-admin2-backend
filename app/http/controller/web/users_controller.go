@@ -46,7 +46,7 @@ func (u *Users) Login(context *gin.Context) {
 					"realName":   userModel.RealName,
 					"phone":      phone,
 					"token":      userToken,
-					"updated_at": time.Now().Format(variable.DateFormart),
+					"updated_at": time.Now().Format(variable.DateFormat),
 				}
 				response.Success(context, consts.CurdStatusOkMsg, data)
 				return
