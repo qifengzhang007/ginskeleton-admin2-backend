@@ -62,7 +62,7 @@ func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64)
 		for index, item := range menuButtonList.ButtonArray {
 			item.FrAuthSystemMenuId = menuId
 			item.Status = 1
-			item.CreatedAt = time.Now().Format(variable.DateFormart)
+			item.CreatedAt = time.Now().Format(variable.DateFormat)
 			item.UpdatedAt = item.CreatedAt
 			menuButtonList.ButtonArray[index] = item
 		}
@@ -84,7 +84,7 @@ func (a *AuthSystemMenuService) UpdateButton(context *gin.Context, menuId int64)
 		for index, item := range menuButtonList.ButtonArray {
 			item.FrAuthSystemMenuId = menuId
 			item.Status = 1
-			item.CreatedAt = time.Now().Format(variable.DateFormart)
+			item.CreatedAt = time.Now().Format(variable.DateFormat)
 			item.UpdatedAt = item.CreatedAt
 			menuButtonList.ButtonArray[index] = item
 		}

@@ -7,7 +7,7 @@ type BaseField struct {
 	Avatar   string   `form:"avatar" json:"avatar"`
 	Phone    string   `form:"phone" json:"phone"`
 	Status   *float64 `form:"status" json:"status" binding:"required,min=0"`
-	Remark   string   `form:"remark" json:"remark" `
+	Remark   string   `form:"remark" json:"remark"`
 }
 
 type Id struct {
@@ -19,7 +19,7 @@ type MenuId struct {
 }
 
 type UserName struct {
-	UserName string `form:"user_name" json:"user_name" `
+	UserName string `form:"user_name" json:"user_name"`
 }
 
 type Pass struct {
