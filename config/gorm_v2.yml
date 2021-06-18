@@ -6,7 +6,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     Write:
       Host: "127.0.0.1"
       DataBase: "db_ginskeleton"
-      Port: 6333
+      Port: 3306
       Prefix: "tb_"
       User: "root"
       Pass: "Secret2017~"
