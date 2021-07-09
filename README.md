@@ -64,6 +64,10 @@
 
 ### 版本更新日志
 
+#### V1.0.20 (2021-07-09)  
+###### 搭配的前端版本：>= [V1.0.14](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 1.删除一处调试语句.  
+
 #### V1.0.19 (2021-06-29)
 ###### 搭配的前端版本：>= [V1.0.14](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.修正自带数据库(`./database/db_ginskeleton_20210629.7z`)——系统菜单表 `tb_auth_system_menu` 菜单排序字段 `sort` 为  `string` 的 `bug`, 导致菜单排序没有按照数字大小排序.
