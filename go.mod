@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/qifengzhang007/goCurl v1.3.2
-	github.com/qifengzhang007/sql_res_to_tree v1.0.12
+	github.com/qifengzhang007/sql_res_to_tree v1.0.13
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/viper v1.8.0
 	github.com/streadway/amqp v1.0.0
