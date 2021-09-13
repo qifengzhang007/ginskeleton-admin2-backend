@@ -64,6 +64,11 @@
 
 ### 版本更新日志
 
+#### V1.0.22 (2021-09-13)
+###### 搭配的前端版本：>= [V1.0.14](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 1.更新token刷新接口逻辑，支持在过期24小时内使用旧token换取新token.  
+- 2.验证码自定义验证逻辑部分完善代码严谨性.  
+
 #### V1.0.21 (2021-08-02)  
 ###### 搭配的前端版本：>= [V1.0.14](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.升级项目依赖版本至最新版
