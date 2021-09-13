@@ -49,9 +49,9 @@ func InitWebRouter() *gin.Engine {
 	verifyCode := router.Group("captcha")
 	{
 		// 验证码业务，该业务无需专门校验参数，所以可以直接调用控制器
-		verifyCode.GET("/", (&chaptcha.Captcha{}).GenerateId)                 //  获取验证码ID
-		verifyCode.GET("/:captchaId", (&chaptcha.Captcha{}).GetImg)           // 获取图像地址
-		verifyCode.GET("/:captchaId/:value", (&chaptcha.Captcha{}).CheckCode) // 校验验证码
+		verifyCode.GET("/", (&chaptcha.Captcha{}).GenerateId)                          //  获取验证码ID
+		verifyCode.GET("/:captcha_id", (&chaptcha.Captcha{}).GetImg)                   // 获取图像地址
+		verifyCode.GET("/:captcha_id/:captcha_value", (&chaptcha.Captcha{}).CheckCode) // 校验验证码
 	}
 	//  创建一个后端接口路由组
 	backend := router.Group("/admin/")
@@ -70,12 +70,16 @@ func InitWebRouter() *gin.Engine {
 			noAuth.Use(authorization.CheckCaptchaAuth()).POST("login", validatorFactory.Create(consts.ValidatorPrefix+"UsersLogin"))
 		}
 
+		// 刷新token
+		backend.Use(authorization.RefreshTokenConditionCheck())
+		{
+			// 刷新token，当过期的token在允许失效的延长时间范围内，用旧token换取新token
+			backend.POST("users/refreshtoken", validatorFactory.Create(consts.ValidatorPrefix+"RefreshToken"))
+		}
+
 		// 【需要token】中间件验证的路由
 		backend.Use(authorization.CheckTokenAuth(), authorization.CheckCasbinAuth())
 		{
-			// 刷新token，当token过期，用旧token换取新token
-			noAuth.POST("refreshtoken", validatorFactory.Create(consts.ValidatorPrefix+"RefreshToken"))
-
 			// 用户组路由
 			users := backend.Group("users/")
 			{

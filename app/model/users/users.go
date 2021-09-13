@@ -79,6 +79,17 @@ func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64
 	return false
 }
 
+//用户刷新token,条件检查: 相关token在过期的时间之内，就符合刷新条件
+func (u *UsersModel) OauthRefreshConditionCheck(userId int64, oldToken string) bool {
+	// 首先判断旧token在本系统自带的数据库已经存在，才允许继续执行刷新逻辑
+	var oldTokenIsExists int
+	sql := "SELECT count(*)  as  counts FROM tb_oauth_access_tokens  WHERE fr_user_id =? and token=? and NOW()<DATE_ADD(expires_at,INTERVAL  ? SECOND)"
+	if u.Raw(sql, userId, oldToken, variable.ConfigYml.GetInt64("Token.JwtTokenRefreshAllowSec")).First(&oldTokenIsExists).Error == nil && oldTokenIsExists == 1 {
+		return true
+	}
+	return false
+}
+
 //用户刷新token
 func (u *UsersModel) OauthRefreshToken(userId, expiresAt int64, oldToken, newToken, clientIp string) bool {
 	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
@@ -120,19 +131,21 @@ func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
 	sql := "SELECT   token  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
+	defer func() {
+		//  凡是查询类记得释放记录集
+		_ = rows.Close()
+	}()
+
 	if err == nil && rows != nil {
 		for rows.Next() {
 			var tempToken string
 			err := rows.Scan(&tempToken)
 			if err == nil {
 				if tempToken == token {
-					_ = rows.Close()
 					return true
 				}
 			}
 		}
-		//  凡是查询类记得释放记录集
-		_ = rows.Close()
 	}
 	return false
 }
