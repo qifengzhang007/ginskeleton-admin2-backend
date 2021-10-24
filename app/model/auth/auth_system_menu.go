@@ -123,7 +123,7 @@ func (a *AuthSystemMenuModel) updatePathInfoNodeLevel(curItemid int64) bool {
 	sql := `
 		UPDATE tb_auth_system_menu a  LEFT JOIN tb_auth_system_menu  b
 		ON  a.fid=b.id
-		SET  a.node_level=b.node_level+1,  a.path_info=CONCAT(b.path_info,',',a.id)
+		SET  a.node_level=IFNULL(b.node_level,0)+1,  a.path_info=CONCAT(IFNULL(b.path_info,0),',',a.id)
 		WHERE  a.id=?
 		`
 	if res := a.Exec(sql, curItemid); res.Error == nil && res.RowsAffected >= 0 {

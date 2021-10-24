@@ -66,7 +66,9 @@ func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64)
 			item.UpdatedAt = item.CreatedAt
 			menuButtonList.ButtonArray[index] = item
 		}
-		if auth.CreateAuthSystemMenuButtonFactory("").InsertData(menuButtonList.ButtonArray) {
+		if len(menuButtonList.ButtonArray) > 0 && auth.CreateAuthSystemMenuButtonFactory("").InsertData(menuButtonList.ButtonArray) {
+			return true
+		} else if len(menuButtonList.ButtonArray) == 0 {
 			return true
 		}
 	}
