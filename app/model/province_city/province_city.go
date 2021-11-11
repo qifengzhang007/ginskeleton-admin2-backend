@@ -118,7 +118,7 @@ func (p *ProvinceCityModel) UpdateData(c *gin.Context) bool {
 
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
 		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
-		if res := p.Omit("CreatedAt").Save(tmp); res.Error == nil {
+		if res := p.Omit("CreatedAt").Save(&tmp); res.Error == nil {
 			_ = p.updatePathInfoNodeLevel(int(tmp.Id))
 		}
 		return true

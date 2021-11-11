@@ -278,14 +278,14 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 		// omit 忽略指定字段
 		if len(tmp.Pass) > 0 {
 			if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
-				if res := u.Omit("CreatedAt").Save(tmp); res.Error == nil {
+				if res := u.Omit("CreatedAt").Save(&tmp); res.Error == nil {
 					return true
 				} else {
 					variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(res.Error))
 				}
 			}
 		} else {
-			if res := u.Omit("CreatedAt", "Pass").Save(tmp); res.Error == nil {
+			if res := u.Omit("CreatedAt", "Pass").Save(&tmp); res.Error == nil {
 				return true
 			} else {
 				variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(res.Error))
