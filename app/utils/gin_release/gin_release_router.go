@@ -11,10 +11,9 @@ import (
 	"io/ioutil"
 )
 
-// 根据 gin 路由包官方的建议，gin 路由引擎如果在生产模式使用，官方建议设置为 release 模式
+// ReleaseRouter 根据 gin 路由包官方的建议，gin 路由引擎如果在生产模式使用，官方建议设置为 release 模式
 // 官方原版提示说明：[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
 // 这里我们将按照官方指导进行生产模式精细化处理
-
 func ReleaseRouter() *gin.Engine {
 	// 切换到生产模式禁用 gin 输出接口访问日志，经过并发测试验证，可以提升5%的性能
 	gin.SetMode(gin.ReleaseMode)
@@ -26,7 +25,7 @@ func ReleaseRouter() *gin.Engine {
 	return engine
 }
 
-// 自定义错误(panic等)拦截中间件、对可能发生的错误进行拦截、统一记录
+// CustomRecovery 自定义错误(panic等)拦截中间件、对可能发生的错误进行拦截、统一记录
 func CustomRecovery() gin.HandlerFunc {
 	DefaultErrorWriter := &PanicExceptionRecord{}
 	return gin.RecoveryWithWriter(DefaultErrorWriter, func(c *gin.Context, err interface{}) {
@@ -36,7 +35,7 @@ func CustomRecovery() gin.HandlerFunc {
 	})
 }
 
-// panic等异常记录
+//PanicExceptionRecord  panic等异常记录
 type PanicExceptionRecord struct{}
 
 func (p *PanicExceptionRecord) Write(b []byte) (n int, err error) {
