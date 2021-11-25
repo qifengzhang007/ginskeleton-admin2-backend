@@ -11,7 +11,7 @@ const (
 
 	//服务器代码发生错误
 	ServerOccurredErrorCode int    = -500100
-	ServerOccurredErrorMsg  string = "服务器内部发生代码执行错误, "
+	ServerOccurredErrorMsg  string = "服务器内部发生代码执行错误,请联系开发者排查错误日志"
 
 	// token相关
 	JwtTokenOK            int    = 200100                      //token有效
