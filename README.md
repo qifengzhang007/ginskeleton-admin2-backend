@@ -64,6 +64,11 @@
 
 ### 版本更新日志
 
+#### V1.0.25 (2021-10-24)
+###### 搭配的前端版本：>= [V1.0.15](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 1.将主线版本更新的内容合并至 `admin-backend` 版本.  
+- 2.详细更新日志参见主线版本(v1.5.29)的更新日志.  
+
 #### V1.0.24 (2021-10-24)
 ###### 搭配的前端版本：>= [V1.0.14](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.修复bug：添加系统菜单时，接口参数有空值时,会导致存储在数据库的个别字段为NULL.
