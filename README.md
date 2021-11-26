@@ -64,8 +64,8 @@
 
 ### 版本更新日志
 
-#### V1.0.25 (2021-10-24)
-###### 搭配的前端版本：>= [V1.0.15](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+#### V1.0.25 (2021-11-26)
+###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.将主线版本更新的内容合并至 `admin-backend` 版本.  
 - 2.详细更新日志参见主线版本(v1.5.29)的更新日志.  
 
