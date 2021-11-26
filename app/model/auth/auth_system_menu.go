@@ -106,7 +106,7 @@ func (a *AuthSystemMenuModel) UpdateData(c *gin.Context) bool {
 	var tmp AuthSystemMenuModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
 		// Omit 表示忽略指定字段(CreatedAt)，其他字段全量更新
-		if res := a.Omit("CreatedAt").Save(tmp); res.Error == nil {
+		if res := a.Omit("CreatedAt").Save(&tmp); res.Error == nil {
 			go a.updatePathInfoNodeLevel(tmp.Id)
 			return true
 		} else {
