@@ -21,11 +21,7 @@ type WithPosUsertList struct {
 func (p WithPosUsertList) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&p); err != nil {
-		errs := gin.H{
-			"tips": "PostList 参数校验失败，参数不符合规定，org_post_name（可空） 、user_name（可空）、page>0、limit>0",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

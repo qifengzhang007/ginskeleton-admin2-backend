@@ -17,11 +17,7 @@ type OrgPostEdit struct {
 func (a OrgPostEdit) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&a); err != nil {
-		errs := gin.H{
-			"tips": "AuthOrganizationPostUpdate参数校验失败，参数不符合规定,Id>0, fid>=0, title 必填, status 数字",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

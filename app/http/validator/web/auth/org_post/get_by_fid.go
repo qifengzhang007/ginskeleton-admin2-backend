@@ -16,11 +16,7 @@ type OrgPostGetByFid struct {
 func (a OrgPostGetByFid) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&a); err != nil {
-		errs := gin.H{
-			"tips": "OrgPostGetByFid 参数校验失败，参数不符合规定,fid >=0",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

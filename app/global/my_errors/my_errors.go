@@ -32,8 +32,10 @@ const (
 	ErrorsRedisInitConnFail string = "初始化redis连接池失败"
 	ErrorsRedisAuthFail     string = "Redis Auth 鉴权失败，密码错误"
 	ErrorsRedisGetConnFail  string = "Redis 从连接池获取一个连接失败，超过最大重试次数"
-	// 验证器错误
+	// 表单参数验证器未通过时的错误
 	ErrorsValidatorNotExists      string = "不存在的验证器"
+	ErrorsValidatorTransInitFail  string = "validator的翻译器初始化错误"
+	ErrorNotAllParamsIsBlank      string = "该接口不允许所有参数都为空,请按照接口要求提交必填参数"
 	ErrorsValidatorBindParamsFail string = "验证器绑定参数失败"
 	//token部分
 	ErrorsTokenInvalid      string = "无效的token"

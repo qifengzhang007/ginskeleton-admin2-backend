@@ -19,11 +19,7 @@ type Edit struct {
 func (u Edit) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&u); err != nil {
-		errs := gin.H{
-			"tips": "province_city，参数校验失败，请检查 id(>=1) 、name长度(>=1)、fid(>=0)、sort(>=0) 、 status>=1",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

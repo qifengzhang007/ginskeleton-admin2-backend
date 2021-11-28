@@ -16,11 +16,7 @@ type ViewButtonList struct {
 func (b ViewButtonList) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&b); err != nil {
-		errs := gin.H{
-			"tips": "ButtonList 参数校验失败，参数不符合规定，user_name（可空）、page的值(>0)、limits的值（>0)",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

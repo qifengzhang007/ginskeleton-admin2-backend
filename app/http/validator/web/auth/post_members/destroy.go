@@ -16,11 +16,7 @@ type PostMembersDestroy struct {
 func (p PostMembersDestroy) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&p); err != nil {
-		errs := gin.H{
-			"tips": "PostMembersDestroy参数校验失败，ID必须为整数",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

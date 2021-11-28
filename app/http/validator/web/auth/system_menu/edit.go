@@ -18,11 +18,7 @@ type SystemMenuEdit struct {
 func (s SystemMenuEdit) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBindJSON(&s); err != nil {
-		errs := gin.H{
-			"tips": "SystemMenuEdit  参数校验失败，参数不符合规定,id ≥ 1、name ≥ 0、path ≥ 0、component ≥ 0、 status ≥ 0、 fid  ≥ 1 、title ≥ 1",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 	context.Set(variable.SystemEditKey, s.MenuEdit)

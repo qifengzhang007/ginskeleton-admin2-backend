@@ -21,11 +21,7 @@ type AssginSystemMenuToOrg struct {
 func (a AssginSystemMenuToOrg) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&a); err != nil {
-		errs := gin.H{
-			"tips": "AssginSystemMenuToOrg  参数校验失败，参数不符合规定, org_post_id ≥ 1、org_post_id ≥ 1、system_menu_id ≥ 1、system_menu_fid ≥ 0、node_type（可选：button、menu）",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 	//  该函数主要是将本结构体的字段（成员）按照 consts.ValidatorPrefix+ json标签对应的 键 => 值 形式直接传递给下一步（控制器）

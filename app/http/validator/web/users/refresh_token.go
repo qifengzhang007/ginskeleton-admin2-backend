@@ -18,11 +18,7 @@ func (r RefreshToken) CheckParams(context *gin.Context) {
 
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBindHeader(&r); err != nil {
-		errs := gin.H{
-			"tips": "Token参数校验失败，参数不符合规定，token 长度>=20",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 	token := strings.Split(r.Authorization, " ")

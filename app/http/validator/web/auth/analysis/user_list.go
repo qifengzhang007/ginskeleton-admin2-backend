@@ -17,11 +17,7 @@ type UserListWithPost struct {
 func (u UserListWithPost) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&u); err != nil {
-		errs := gin.H{
-			"tips": "UserListWithPost 参数校验失败，参数不符合规定，user_name（可空）、page的值(>0)、limit 的值（>0)",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

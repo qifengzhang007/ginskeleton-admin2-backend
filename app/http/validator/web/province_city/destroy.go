@@ -17,11 +17,7 @@ type Destroy struct {
 func (d Destroy) CheckParams(context *gin.Context) {
 
 	if err := context.ShouldBind(&d); err != nil {
-		errs := gin.H{
-			"tips": "province_city Destroy  参数校验失败，参数校验失败，请检查id(>=1)",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

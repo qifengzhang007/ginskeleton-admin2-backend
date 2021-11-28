@@ -18,11 +18,7 @@ type ButtonEdit struct {
 func (b ButtonEdit) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&b); err != nil {
-		errs := gin.H{
-			"tips": "ButtonStore参数校验失败，参数校验失败，请检查cn_name(>=2)、en_name(>=2)、color(>=2)、allow_method(>=2)、status>=0",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

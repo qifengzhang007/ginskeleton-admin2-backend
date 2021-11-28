@@ -16,11 +16,7 @@ type OrgPostCreate struct {
 func (a OrgPostCreate) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&a); err != nil {
-		errs := gin.H{
-			"tips": "AuthOrganizationPostCreate参数校验失败，参数不符合规定,fid>=0、title不为空、status>=0",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 

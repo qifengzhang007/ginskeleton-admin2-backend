@@ -15,11 +15,7 @@ type SysMenuMountButton struct {
 func (m SysMenuMountButton) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&m); err != nil {
-		errs := gin.H{
-			"tips": "SysMenuMountButton  参数校验失败，参数不符合规定, fr_auth_system_menu_id ≥",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 	//  该函数主要是将本结构体的字段（成员）按照 consts.ValidatorPrefix+ json标签对应的 键 => 值 形式直接传递给下一步（控制器）

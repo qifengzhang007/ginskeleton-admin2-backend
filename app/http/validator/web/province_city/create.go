@@ -18,11 +18,7 @@ type Create struct {
 func (s Create) CheckParams(context *gin.Context) {
 	//1.基本的验证规则没有通过
 	if err := context.ShouldBind(&s); err != nil {
-		errs := gin.H{
-			"tips": "province_city Create  参数校验失败，参数校验失败，请检查 name长度(>=1)、fid(>=0)、sort(>=0) 、 status>=0",
-			"err":  err.Error(),
-		}
-		response.ErrorParam(context, errs)
+		response.ValidatorError(context, err)
 		return
 	}
 
