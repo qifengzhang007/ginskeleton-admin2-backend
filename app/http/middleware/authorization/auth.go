@@ -16,7 +16,7 @@ type HeaderParams struct {
 	Authorization string `header:"Authorization" binding:"required,min=20"`
 }
 
-// 检查token完整性、有效性中间件
+// CheckTokenAuth 检查token完整性、有效性中间件
 func CheckTokenAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
 
@@ -24,7 +24,6 @@ func CheckTokenAuth() gin.HandlerFunc {
 
 		//  推荐使用 ShouldBindHeader 方式获取头参数
 		if err := context.ShouldBindHeader(&headerParams); err != nil {
-			context.Abort()
 			response.ErrorParam(context, consts.JwtTokenMustValid+err.Error())
 			return
 		}
@@ -47,13 +46,12 @@ func CheckTokenAuth() gin.HandlerFunc {
 	}
 }
 
-// 刷新token条件检查中间件，针对已经过期的token，要求是token格式以及携带的信息满足配置参数即可
+// RefreshTokenConditionCheck 刷新token条件检查中间件，针对已经过期的token，要求是token格式以及携带的信息满足配置参数即可
 func RefreshTokenConditionCheck() gin.HandlerFunc {
 	return func(context *gin.Context) {
 
 		headerParams := HeaderParams{}
 		if err := context.ShouldBindHeader(&headerParams); err != nil {
-			context.Abort()
 			response.ErrorParam(context, consts.JwtTokenMustValid+err.Error())
 			return
 		}
