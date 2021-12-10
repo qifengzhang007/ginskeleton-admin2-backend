@@ -62,7 +62,7 @@ FileUploadSetting:
     - "application/zip"               #xlsx、docx、zip
     - "application/x-gzip"            #tar.gz
     - "text/plain; charset=utf-8"     #txt log json等文本文件
-
+    - "audio/mpeg"     #音频文件，例如: mp3
 RabbitMq:
   HelloWorld:
     Addr: "amqp://账号:密码@ip地址:5672"                        #消息服务器地址、账号、密码
