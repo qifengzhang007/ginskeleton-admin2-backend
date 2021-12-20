@@ -64,6 +64,12 @@
 
 ### 版本更新日志
 
+#### V1.0.27 (2021-12-20)
+###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 1.错误日志记录时同时记录调用链信息。
+- 2.rabbitmq 消息队列增加消息延迟发送功能.
+- 3.关于 rabbitmq 消息延迟使用请参考新版在线文档.
+
 #### V1.0.26 (2021-11-28)
 ###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.引入表单参数验证器全局翻译器,简化代码书写,提升开发效率.
