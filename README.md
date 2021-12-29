@@ -63,6 +63,11 @@
 > 2.[业务开发指南](./docs/guide.md)  
 
 ### 版本更新日志
+#### V1.0.28 (2021-12-29)
+###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 更新：
+- 1.gorm查询时,调整 created_at、updated_at字段默认格式为 yyyy-mm-dd (2021-12-29 11:20:00) 格式,不在需要手动转换。
+- 2.gorm批量新增时支持自动给切片的中的created_at、updated_at字段赋值。
 
 #### V1.0.27 (2021-12-20)
 ###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)

@@ -156,7 +156,7 @@ Status        *float64 `form:"status" json:"status" binding:"required,min=0"`
 ```
 
 #### 7 将按钮管理表(tb_auth_button_cn_en) 绑定在某个菜单
-> 每一个 model 都可以绑定给一个菜单, 然后该菜单就可以分配给任何岗位、部门、公司，而最终用户则通过他所挂接的岗位，逐级向上继承一系列权限.  
+> 每一个 model 都可以绑定给一个菜单, 然后该菜单就可以分配给任何岗位、部门、公司，而最终用户则通过他所挂接的岗位，逐级向上继承一系列权限.
 ![将后台开发完成的模块绑定给菜单](https://www.ginskeleton.com/images/menu_set.jpg)  
 
 #### 8 将按钮管理表(tb_auth_button_cn_en)已绑定的菜单分配给组织机构(岗位、部门、公司等) 
