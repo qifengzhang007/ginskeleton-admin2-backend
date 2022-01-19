@@ -41,8 +41,8 @@ func (b *ButtonCnEnModel) getCounts(keyWords string) (counts int64) {
 func (b *ButtonCnEnModel) Show(keyWords string, limitStart, limitItems int) (totalCounts int64, temp []ButtonCnEnModel) {
 	totalCounts = b.getCounts(keyWords)
 	if totalCounts > 0 {
-		sql := "SELECT  `id`, `cn_name`,`allow_method`, `en_name`, `remark`,DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  AS created_at," +
-			" DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at   FROM  `tb_auth_button_cn_en`  WHERE  ( cn_name like ? or en_name like  ?) LIMIT ?,?"
+		sql := "SELECT  `id`, `cn_name`,`allow_method`, `en_name`, `remark`, created_at," +
+			"  updated_at   FROM  `tb_auth_button_cn_en`  WHERE  ( cn_name like ? or en_name like  ?) LIMIT ?,?"
 		if res := b.Raw(sql, "%"+keyWords+"%", "%"+keyWords+"%", limitStart, limitItems).Find(&temp); res.RowsAffected > 0 {
 			return totalCounts, temp
 		} else {

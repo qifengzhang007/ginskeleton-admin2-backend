@@ -31,7 +31,7 @@ func (a *AuthOrganizationPostModel) GetCount(fid int, title string) (count int64
 	return
 }
 func (a *AuthOrganizationPostModel) List(limitStart int, limit int, fid int, title string) (data []AuthOrganizationPostModel) {
-	a.Model(a).Select("id", "fid", "title", "status", "path_info", "remark", "DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at", "DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at").Where("fid = ? AND title like ?", fid, "%"+title+"%").Offset(limitStart).Limit(limit).Find(&data)
+	a.Model(a).Select("id", "fid", "title", "status", "path_info", "remark", "created_at", "updated_at").Where("fid = ? AND title like ?", fid, "%"+title+"%").Offset(limitStart).Limit(limit).Find(&data)
 	return
 }
 

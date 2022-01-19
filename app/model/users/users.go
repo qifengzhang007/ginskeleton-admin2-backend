@@ -164,7 +164,7 @@ func (u *UsersModel) SetTokenInvalid(userId int) bool {
 
 //根据用户ID查询一条信息
 func (u *UsersModel) ShowOneItem(userId int64) (*UsersModel, error) {
-	sql := "SELECT  `id`, `user_name`,`pass`, `real_name`, `phone`, `avatar`,`status` FROM  `tb_users`  WHERE `status`=1 and   id=? LIMIT 1"
+	sql := "SELECT  `id`, `user_name`,`pass`, `real_name`, `login_times`,`phone`, `avatar`,`status`,created_at,updated_at FROM  `tb_users`  WHERE `status`=1 and   id=? LIMIT 1"
 	result := u.Raw(sql, userId).First(u)
 	if result.Error == nil {
 		return u, nil
@@ -193,9 +193,7 @@ func (u *UsersModel) PostList(nameKeyWords, orgPostName string, limitStart, limi
 	totalCounts = u.getPostListCounts(nameKeyWords, orgPostName)
 	if totalCounts > 0 {
 		sql := `
-			SELECT  a.id, a.user_name, a.real_name,a.phone, a.status,a.last_login_ip,a.remark,a.login_times,
-			DATE_FORMAT(a.created_at,'%Y-%m-%d %H:%i:%s')  AS created_at,
-			DATE_FORMAT(a.updated_at,'%Y-%m-%d %H:%i:%s')  AS updated_at,  
+			SELECT  a.id, a.user_name, a.real_name,a.phone, a.status,a.last_login_ip,a.remark,a.login_times,created_at,updated_at,
 			c.id AS org_post_id, c.title AS  org_post_name FROM tb_users  a 
 			LEFT  JOIN  tb_auth_post_members  b  ON  a.id=b.fr_user_id
 			LEFT  JOIN  tb_auth_organization_post  c  ON b.fr_auth_organization_post_id=c.id

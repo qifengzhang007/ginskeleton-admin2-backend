@@ -98,6 +98,8 @@ func InitWebRouter() *gin.Engine {
 				users.POST("destroy", validatorFactory.Create(consts.ValidatorPrefix+"UserDestroy"))
 				// 用户获取动态菜单
 				users.GET("info", (&web.Users{}).UserInfo)
+				users.GET("personal_info", (&web.Users{}).GetPersonalInfo)                              // 每个用户获取属于自己的账号信息
+				users.POST("personal_edit", validatorFactory.Create(consts.ValidatorPrefix+"UserEdit")) // 每个用户编辑属于自己的账号信息
 				// 用户获取视图页面拥有的权限按钮
 				users.GET("has_view_button_list", validatorFactory.Create(consts.ValidatorPrefix+"ViewButtonList"))
 			}

@@ -170,3 +170,43 @@ func (u *Users) GetButtonListByMenuId(context *gin.Context) {
 	}
 
 }
+
+// GetPersonalInfo 每个用户查询自己的个人信息
+func (u *Users) GetPersonalInfo(context *gin.Context) {
+	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
+	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
+	if !exist {
+		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
+	} else {
+		user, _ := users.CreateUserFactory("").ShowOneItem(currentUser.UserId)
+		user.Pass = "" // pass 设置为空，不给前台展示
+		response.Success(context, consts.CurdStatusOkMsg, user)
+	}
+}
+
+// EditPersonalInfo 编辑自己的信息
+func (u *Users) EditPersonalInfo(context *gin.Context) {
+	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
+	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
+	if !exist {
+		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
+	} else {
+
+		userName := context.GetString(consts.ValidatorPrefix + "user_name")
+		usersModel := users.CreateUserFactory("")
+
+		// 检查正在修改的用户名是否被其他站使用
+		if usersModel.UpdateDataCheckUserNameIsUsed(int(currentUser.UserId), userName) > 0 {
+			response.Fail(context, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg+",该用户名: "+userName+" 已经被其他人占用", "")
+			return
+		}
+		// 这里使用token解析的id更新表单参数里面的id，加固安全
+		context.Set(consts.ValidatorPrefix+"id", currentUser.UserId)
+
+		if usersModel.UpdateData(context) {
+			response.Success(context, consts.CurdStatusOkMsg, "")
+		} else {
+			response.Fail(context, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg, "")
+		}
+	}
+}

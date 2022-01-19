@@ -36,7 +36,7 @@ func (p *ProvinceCityModel) GetCount(fid int, name string) (count int64) {
 func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (list []ProvinceCityModel) {
 	sql := `
 		SELECT
-		id,  fid,name ,node_level ,status ,sort ,remark ,DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at , DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at
+		id,  fid,name ,node_level ,status ,sort ,remark ,created_at , updated_at
 		FROM tb_province_city 
 		WHERE   fid= ? AND   name LIKE  ? ORDER  BY sort Desc, fid ASC ,id  ASC
 		LIMIT ? , ?;
@@ -51,8 +51,7 @@ func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (list 
 func (p *ProvinceCityModel) GetSubListByfid(fid int) []ProvinceCityTree {
 	sql := `
 		SELECT
-		a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark , 
-		DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at , DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at ,
+		a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark , a.created_at , a.updated_at
 		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_province_city  WHERE  fid=a.id ) AS  has_sub_node
 		FROM tb_province_city a
 		WHERE   fid= ?
