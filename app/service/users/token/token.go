@@ -105,7 +105,7 @@ func (u *userToken) isNotExpired(token string, expireAtSec int64) (*my_jwt.Custo
 func (u *userToken) IsEffective(token string) bool {
 	customClaims, code := u.isNotExpired(token, 0)
 	if consts.JwtTokenOK == code {
-		//if user_item := Model.CreateUserFactory("").ShowOneItem(customClaims.UserId); user_item != nil {
+		//token符合token本身的规则以后，继续在数据库校验是不是符合本系统其他设置，例如：一个用户默认只允许10个账号同时在线（10个token同时有效）
 		if users.CreateUserFactory("").OauthCheckTokenIsOk(customClaims.UserId, token) {
 			return true
 		}

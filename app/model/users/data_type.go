@@ -28,3 +28,10 @@ type UserHasButtons struct {
 	CnName string `json:"cn_name"`
 	EnName string `json:"en_name"`
 }
+
+// 待缓存到 redis的有效 token数据
+type TokenToRedis struct {
+	Id        int    `json:"id"`
+	Token     string `json:"token"`
+	ExpiresAt string `json:"expires_at"`
+}
