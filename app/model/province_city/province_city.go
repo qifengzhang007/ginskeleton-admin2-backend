@@ -51,7 +51,7 @@ func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (list 
 func (p *ProvinceCityModel) GetSubListByfid(fid int) []ProvinceCityTree {
 	sql := `
 		SELECT
-		a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark , a.created_at , a.updated_at
+		a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark , a.created_at , a.updated_at,
 		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_province_city  WHERE  fid=a.id ) AS  has_sub_node
 		FROM tb_province_city a
 		WHERE   fid= ?
