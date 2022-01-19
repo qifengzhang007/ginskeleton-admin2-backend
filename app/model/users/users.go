@@ -263,6 +263,13 @@ func (u *UsersModel) InsertData(c *gin.Context) bool {
 	return false
 }
 
+//UpdateDataCheckUserNameIsUsed 更新前检查新的用户名是否已经存在（避免和别的账号重名）
+func (u *UsersModel) UpdateDataCheckUserNameIsUsed(userId int, userName string) (exists int64) {
+	sql := "select count(*) as counts from tb_users where  id!=?  AND user_name=?"
+	_ = u.Raw(sql, userId, userName).First(&exists)
+	return exists
+}
+
 //更新
 func (u *UsersModel) UpdateData(c *gin.Context) bool {
 	var tmp UsersModel

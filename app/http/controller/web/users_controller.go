@@ -112,6 +112,14 @@ func (u *Users) Create(context *gin.Context) {
 
 //5.用户更新(update)
 func (u *Users) Edit(context *gin.Context) {
+	userId := context.GetFloat64(consts.ValidatorPrefix + "id")
+	userName := context.GetString(consts.ValidatorPrefix + "user_name")
+	// 检查正在修改的用户名是否被其他人使用
+	if users.CreateUserFactory("").UpdateDataCheckUserNameIsUsed(int(userId), userName) > 0 {
+		response.Fail(context, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg+", "+userName+" 已经被其他人使用", "")
+		return
+	}
+
 	//注意：这里没有实现权限控制逻辑，例如：超级管理管理员可以更新全部用户数据，普通用户只能修改自己的数据。目前只是验证了token有效、合法之后就可以进行后续操作
 	// 实际使用请根据真是业务实现权限控制逻辑、再进行数据库操作
 	if users.CreateUserFactory("").UpdateData(context) {

@@ -384,8 +384,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/qifengzhang007/goCurl v1.3.2 h1:dnsJIz8z6iMZC7kinyS7GlJnDpXvbkdlEd3yMBOXaIQ=
-github.com/qifengzhang007/goCurl v1.3.2/go.mod h1:TsF+sLU+snpIwZZvCafoktfd1788YbLG/hIrp6WpW6I=
+github.com/qifengzhang007/goCurl v1.3.3 h1:4L26+5n/p21tm8pcKQPsHV4Brq2pMsbn0fcHOF/15cw=
+github.com/qifengzhang007/goCurl v1.3.3/go.mod h1:TsF+sLU+snpIwZZvCafoktfd1788YbLG/hIrp6WpW6I=
 github.com/qifengzhang007/sql_res_to_tree v1.0.14 h1:7qEnInqAm8gh1hNbPkYmi1DM0VN5JDJiIseQTLDeRp0=
 github.com/qifengzhang007/sql_res_to_tree v1.0.14/go.mod h1:GWGWedG/Bo0Ni9TRpLGBGemucjEEOn+D/aIi+pEkSfo=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
