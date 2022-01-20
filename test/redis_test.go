@@ -94,4 +94,33 @@ func TestRedisReConn(t *testing.T) {
 	redisClient.ReleaseOneRedisClient()
 }
 
+// 获取结果是切片的数据类型
+func TestRedisResSlice(t *testing.T) {
+	redisClient := redis_factory.GetOneRedisClient()
+	res, err := redisClient.Int64(redisClient.Execute("zAdd", "users", 100, "张三丰", 90, "张翠山", 80, "张无忌"))
+	if err != nil {
+		t.Errorf("单元测试失败,%s\n", err.Error())
+	} else {
+		variable.ZapLog.Info("Info 日志", zap.Int64("添加成员个数", res))
+	}
+
+	// 获取结果
+	// zRevRange  users 0 1 使用redis客户端执行以后返回结果：
+	// 1) "张三丰"
+	// 2) "张翠山"
+	// 在 go 中我们按照切片获取结果即可
+	strS, err := redisClient.Strings(redisClient.Execute("zRevRange", "users", 0, 1))
+	t.Log("按照分数从高到低取出2个值：", strS)
+
+	// zRange  users 0 1 使用redis客户端执行以后返回结果:
+	//1) "张无忌"
+	//2) "张翠山"
+	// 在 go 中我们按照切片获取结果即可
+	strS, err = redisClient.Strings(redisClient.Execute("zRange", "users", 0, 1))
+	t.Log("按照分数从低到高取出2个值：", strS)
+
+	//官方明确说，redis使用完毕，必须释放
+	redisClient.ReleaseOneRedisClient()
+}
+
 //  其他请参照以上示例即可
