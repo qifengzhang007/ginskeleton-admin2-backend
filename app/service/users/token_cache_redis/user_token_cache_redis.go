@@ -3,6 +3,7 @@ package token_cache_redis
 import (
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
+	"goskeleton/app/utils/md5_encrypt"
 	"goskeleton/app/utils/redis_factory"
 	"strconv"
 	"strings"
@@ -24,7 +25,7 @@ type userTokenCacheRedis struct {
 
 // SetTokenCache 设置缓存
 func (u *userTokenCacheRedis) SetTokenCache(tokenExpire int64, token string) bool {
-	if _, err := u.redisClient.Int(u.redisClient.Execute("zAdd", u.userTokenKey, tokenExpire, token)); err == nil {
+	if _, err := u.redisClient.Int(u.redisClient.Execute("zAdd", u.userTokenKey, tokenExpire, md5_encrypt.MD5(token))); err == nil {
 		return true
 	}
 	return false
@@ -32,6 +33,9 @@ func (u *userTokenCacheRedis) SetTokenCache(tokenExpire int64, token string) boo
 
 // DelOverMaxOnlineCache 删除缓存,删除超过系统允许最大在线数量之外的用户
 func (u *userTokenCacheRedis) DelOverMaxOnlineCache() bool {
+	// 首先先删除过期的token
+	_, _ = u.redisClient.Execute("zRemRangeByScore", u.userTokenKey, 0, time.Now().Unix()-1)
+
 	onlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	alreadyCacheNum, err := u.redisClient.Int(u.redisClient.Execute("zCard", u.userTokenKey))
 	if err == nil && alreadyCacheNum > onlineUsers {
@@ -47,6 +51,7 @@ func (u *userTokenCacheRedis) DelOverMaxOnlineCache() bool {
 
 // TokenCacheIsExists 查询token是否在redis存在
 func (u *userTokenCacheRedis) TokenCacheIsExists(token string) (exists bool) {
+	token = md5_encrypt.MD5(token)
 	curTimestamp := time.Now().Unix()
 	onlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	if strSlice, err := u.redisClient.Strings(u.redisClient.Execute("zRevRange", u.userTokenKey, 0, onlineUsers-1)); err == nil {
