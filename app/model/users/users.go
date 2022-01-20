@@ -128,11 +128,17 @@ func (u *UsersModel) OauthDestroyToken(userId int) bool {
 
 // 判断用户token是否在数据库存在+状态OK
 func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
+
+	// 异步缓存用户有效的token到redis
+	if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
+		go u.ValidTokenCacheToRedis(userId)
+	}
+
 	sql := "SELECT   token  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
 	defer func() {
-		//  凡是查询类记得释放记录集
+		//  凡是获取原生结果集的查询，记得释放记录集
 		_ = rows.Close()
 	}()
 
@@ -278,6 +284,11 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 		} else {
 			tmp.Pass = md5_encrypt.Base64Md5(tmp.Pass)
 			tmp.LastLoginIp = c.ClientIP()
+
+			// 如果用户密码被修改，那么redis中的token值也清除
+			if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
+				go u.DelTokenCacheFromRedis(tmp.Id)
+			}
 		}
 		// updates 不会处理零值字段，save 会全量覆盖式更新字段
 		// omit 忽略指定字段
@@ -306,6 +317,11 @@ func (u *UsersModel) DeleteData(id int) bool {
 		// id 为 1 等于 admin 用户, 不能删除
 		return false
 	}
+	// 删除用户时，清除用户缓存在redis的全部token
+	if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
+		go u.DelTokenCacheFromRedis(int64(id))
+	}
+
 	if u.Delete(u, id).Error == nil {
 		if u.OauthDestroyToken(id) {
 			go u.deleteDataHook(id)
@@ -359,7 +375,7 @@ func (u *UsersModel) GetButtonListByMenuId(orgIds []int, MenuId int64) (r []User
 		AND
 		b.fr_auth_button_cn_en_id=c.id
 		AND 
-		a.fr_auth_orgnization_post_id  IN  ?
+		a.fr_auth_orgnization_post_id  IN  (?)
 		AND
 		a.fr_auth_system_menu_id  IN (?)
 		`
