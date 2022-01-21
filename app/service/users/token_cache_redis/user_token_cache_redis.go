@@ -25,6 +25,7 @@ type userTokenCacheRedis struct {
 
 // SetTokenCache 设置缓存
 func (u *userTokenCacheRedis) SetTokenCache(tokenExpire int64, token string) bool {
+	// 存储用户token时转为MD5，下一步比较的时候可以更加快速地比较是否一致
 	if _, err := u.redisClient.Int(u.redisClient.Execute("zAdd", u.userTokenKey, tokenExpire, md5_encrypt.MD5(token))); err == nil {
 		return true
 	}
@@ -62,8 +63,6 @@ func (u *userTokenCacheRedis) TokenCacheIsExists(token string) (exists bool) {
 						exists = true
 						break
 					}
-				} else {
-					exists = false
 				}
 			}
 		}
