@@ -15,7 +15,7 @@ func CreateUsersTokenCacheFactory(userId int64) *userTokenCacheRedis {
 	if redCli == nil {
 		return nil
 	}
-	return &userTokenCacheRedis{redisClient: redCli, userTokenKey: "user_token_" + strconv.FormatInt(userId, 10)}
+	return &userTokenCacheRedis{redisClient: redCli, userTokenKey: "token_userid_" + strconv.FormatInt(userId, 10)}
 }
 
 type userTokenCacheRedis struct {
