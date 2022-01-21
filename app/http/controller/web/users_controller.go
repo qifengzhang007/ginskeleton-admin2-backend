@@ -201,7 +201,7 @@ func (u *Users) EditPersonalInfo(context *gin.Context) {
 			return
 		}
 		// 这里使用token解析的id更新表单参数里面的id，加固安全
-		context.Set(consts.ValidatorPrefix+"id", currentUser.UserId)
+		context.Set(consts.ValidatorPrefix+"id", float64(currentUser.UserId))
 
 		if usersModel.UpdateData(context) {
 			response.Success(context, consts.CurdStatusOkMsg, "")

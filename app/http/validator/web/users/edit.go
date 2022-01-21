@@ -6,6 +6,7 @@ import (
 	"goskeleton/app/http/controller/web"
 	"goskeleton/app/http/validator/core/data_transfer"
 	"goskeleton/app/utils/response"
+	"strings"
 )
 
 type Edit struct {
@@ -28,6 +29,10 @@ func (u Edit) CheckParams(context *gin.Context) {
 		response.ErrorSystem(context, "UserUpdate表单验证器json化失败", "")
 	} else {
 		// 验证完成，调用控制器,并将验证器成员(字段)递给控制器，保持上下文数据一致性
-		(&web.Users{}).Edit(extraAddBindDataContext)
+		if strings.HasPrefix(context.Request.RequestURI, "/admin/users/personal_edit") {
+			(&web.Users{}).EditPersonalInfo(extraAddBindDataContext)
+		} else {
+			(&web.Users{}).Edit(extraAddBindDataContext)
+		}
 	}
 }
