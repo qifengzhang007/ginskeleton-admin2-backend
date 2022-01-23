@@ -133,15 +133,9 @@ func (u *UsersModel) OauthDestroyToken(userId int) bool {
 
 // 判断用户token是否在数据库存在+状态OK
 func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
-
 	sql := "SELECT   token  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
-	defer func() {
-		//  凡是获取原生结果集的查询，记得释放记录集
-		_ = rows.Close()
-	}()
-
 	if err == nil && rows != nil {
 		for rows.Next() {
 			var tempToken string
@@ -152,6 +146,8 @@ func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
 				}
 			}
 		}
+		//  凡是获取原生结果集的查询，记得释放记录集
+		_ = rows.Close()
 	}
 	return false
 }
