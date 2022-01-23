@@ -9,7 +9,7 @@ import (
 
 type BaseModel struct {
 	*gorm.DB  `gorm:"-" json:"-"`
-	Id        int64  `gorm:"primarykey" json:"id"`
+	Id        int64  `gorm:"primaryKey" json:"id"`
 	CreatedAt string `json:"created_at"` // 时间日期直接按照字符串处理即可
 	UpdatedAt string `json:"updated_at"`
 }
