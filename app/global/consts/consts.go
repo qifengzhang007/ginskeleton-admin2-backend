@@ -20,6 +20,7 @@ const (
 	JwtTokenFormatErrCode int    = -400102                     //提交的 token 格式错误
 	JwtTokenFormatErrMsg  string = "提交的 token 格式错误"            //提交的 token 格式错误
 	JwtTokenMustValid     string = "token为必填项,请在请求header部分提交!" //提交的 token 格式错误
+	GinSetTrustProxyError string = "Gin 设置信任代理服务器出错"
 
 	//SnowFlake 雪花算法
 	StartTimeStamp = int64(1483228800000) //开始时间截 (2017-01-01)
