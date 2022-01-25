@@ -99,6 +99,10 @@ func (u *UsersModel) OauthRefreshConditionCheck(userId int64, oldToken string) b
 func (u *UsersModel) OauthRefreshToken(userId, expiresAt int64, oldToken, newToken, clientIp string) bool {
 	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
 	if u.Exec(sql, newToken, time.Unix(expiresAt, 0).Format(variable.DateFormat), clientIp, userId, oldToken).Error == nil {
+		// 异步缓存用户有效的token到redis
+		if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
+			go u.ValidTokenCacheToRedis(userId)
+		}
 		return true
 	}
 	return false
