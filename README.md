@@ -63,11 +63,19 @@
 > 2.[业务开发指南](./docs/guide.md)  
 
 ### 版本更新日志
-#### V1.0.28 (2021-12-29)
-###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
-- 更新：
-- 1.gorm查询时,调整 created_at、updated_at字段默认格式为 yyyy-mm-dd (2021-12-29 11:20:00) 格式,不在需要手动转换。
-- 2.gorm批量新增时支持自动给切片的中的created_at、updated_at字段赋值。
+
+#### V1.0.29 (2022-01-25)
+###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)  
+
+* 新增
+- 1.用户 `token` 缓存到 `redis` 功能,如果项目使用了 `redis` , 请直接在 config/config.yml 文件中设置 `Token.IsCacheToRedis = 1`
+- 2.项目初始化时增加设置信任代理服务器ip列表，gin(v1.7.7)新增功能,详情参见相关配置项说明.
+- 3.新增个人信息自主编辑功能，方便小权限账号编辑自己的账号密码. 
+
+* 更新
+- 1.配置文件缓存时加锁,避免开发者频繁注册时,程序出现提示。
+- 2.用户token鉴权时,如果开启了redis缓存功能，优先查询redis.
+- 4.所有底层依赖包更新至最新版.  
 
 #### V1.0.27 (2021-12-20)
 ###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
