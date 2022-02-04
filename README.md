@@ -64,6 +64,13 @@
 
 ### 版本更新日志
 
+#### V1.0.30 (2022-02-05)
+###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+* bug 修复
+- 1.大批量分配权限时会出现部分失败的情况，老版本 admin 升级最快捷方式：直接使用最新版本 `app/model/auth/auth_menu_assign.go` 文件覆盖同名文件即可.  
+* 更新
+- 1.自带数据库文件更新, 为大批量操作的相关表字段创建索引.
+
 #### V1.0.29 (2022-01-25)
 ###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)  
 
