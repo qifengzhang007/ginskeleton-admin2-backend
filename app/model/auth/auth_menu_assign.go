@@ -88,12 +88,12 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 			sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 			var temId int
 			if res = a.Raw(sql, orgId, systemMenuId).First(&temId); res.Error == nil && temId > 0 {
-			label1:
 				sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
 					`
 				if buttonId > 0 {
+				label1:
 					if res = a.Exec(sql, temId, buttonId, temId, buttonId); res.Error == nil {
 						// 继续分配接口的访问权限(casbin_rules写入相关数据)
 						var lastID int
@@ -101,7 +101,6 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 						if res = a.Raw(sql, temId, buttonId).First(&lastID); res.Error == nil {
 							assginRes = a.AssginCasbinAuthPolicyToOrg(lastID, nodeType)
 						}
-
 					} else {
 						// insert into 执行时遇见死锁状态，尝试重新执行，最大允许五次尝试，否则就记录错误
 						if failTryTimes <= 5 {
@@ -178,12 +177,12 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 			AuthPostMountHasMenuButtonId int
 		}
 		if res := a.Raw(sql, authPostMountHasMenuButtonId).First(&tmp); res.Error == nil {
-		label1:
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
 			WHERE NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a WHERE  a.ptype=? AND  a.v0=? AND  a.v1=? AND  a.v2=? FOR UPDATE)
 			`
+		label1:
 			if res = a.Exec(sql, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod, tmp.AuthPostMountHasMenuButtonId, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod); res.Error == nil {
 				// 为当前节点继续分配g(group权限，设置部门继承关系)
 				return a.AssginCasbinAuthGroupToOrg(tmp.FrAuthOrgnizationPostId)
