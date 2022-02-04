@@ -79,11 +79,16 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 	}
 	//2.当前菜单增加一条分配记录
 	if res := a.Exec(sql, orgId, systemMenuId, orgId, systemMenuId); res.Error == nil {
-
+		// 权限分配模块
+		// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台可能会出现死锁发生（insert into 时发生了死锁）
+		// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
+		var failTryTimes = 1
 		if nodeType == "button" {
 			sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 			var temId int
 			if res = a.Raw(sql, orgId, systemMenuId).First(&temId); res.Error == nil && temId > 0 {
+			label1:
+				failTryTimes++
 				sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
@@ -98,6 +103,10 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 						}
 
 					} else {
+						// insert into 执行时遇见死锁尝试重新执行，最大允许三次尝试，否则就记录错误
+						if failTryTimes <= 3 {
+							goto label1
+						}
 						variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
 						assginRes = false
 					}
@@ -147,7 +156,8 @@ func (a *AuthMenuAssignModel) DeleteCasbibRules(authPostMountHasMenuButtonId int
 
 // 给组织机构节点分配casbin的policy策略权限
 func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuButtonId int, nodeType string) (resBool bool) {
-
+	// 参见 82 行注释
+	var failTryTimes = 1
 	resBool = true
 	// 分配了按钮，才可以同步分配按钮对应的路由接口
 	if nodeType == "button" {
@@ -168,6 +178,8 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 			AuthPostMountHasMenuButtonId int
 		}
 		if res := a.Raw(sql, authPostMountHasMenuButtonId).First(&tmp); res.Error == nil {
+		label1:
+			failTryTimes++
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
@@ -177,6 +189,9 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 				// 为当前节点继续分配g(group权限，设置部门继承关系)
 				return a.AssginCasbinAuthGroupToOrg(tmp.FrAuthOrgnizationPostId)
 			} else {
+				if failTryTimes <= 3 {
+					goto label1
+				}
 				resBool = false
 				variable.ZapLog.Error("AuthMenuAssignModel 发生错误", zap.Error(res.Error))
 			}
