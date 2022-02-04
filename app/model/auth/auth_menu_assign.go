@@ -66,6 +66,11 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 
 // 给组织机构（部门、岗位）分配菜单权限
 func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assginRes bool) {
+	// 权限分配模块
+	// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台sql执行时可能会遇见死锁状态发生（insert into 时发生了死锁）
+	// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
+	var failTryTimes = 1
+
 	assginRes = true
 	sql := `INSERT  INTO tb_auth_post_mount_has_menu(fr_auth_orgnization_post_id,fr_auth_system_menu_id)
 			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
@@ -79,16 +84,11 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 	}
 	//2.当前菜单增加一条分配记录
 	if res := a.Exec(sql, orgId, systemMenuId, orgId, systemMenuId); res.Error == nil {
-		// 权限分配模块
-		// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台可能会出现死锁发生（insert into 时发生了死锁）
-		// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
-		var failTryTimes = 1
 		if nodeType == "button" {
 			sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 			var temId int
 			if res = a.Raw(sql, orgId, systemMenuId).First(&temId); res.Error == nil && temId > 0 {
 			label1:
-				failTryTimes++
 				sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
@@ -103,8 +103,9 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 						}
 
 					} else {
-						// insert into 执行时遇见死锁尝试重新执行，最大允许三次尝试，否则就记录错误
-						if failTryTimes <= 3 {
+						// insert into 执行时遇见死锁状态，尝试重新执行，最大允许五次尝试，否则就记录错误
+						if failTryTimes <= 5 {
+							failTryTimes++
 							goto label1
 						}
 						variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
@@ -149,14 +150,13 @@ func (a *AuthMenuAssignModel) DeleteCasbibRules(authPostMountHasMenuButtonId int
 			variable.ZapLog.Error("AuthMenuAssignModel 删除casbin权限失败" + res.Error.Error())
 			resBool = false
 		}
-
 	}
 	return
 }
 
 // 给组织机构节点分配casbin的policy策略权限
 func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuButtonId int, nodeType string) (resBool bool) {
-	// 参见 82 行注释
+	// 参见 69 行注释
 	var failTryTimes = 1
 	resBool = true
 	// 分配了按钮，才可以同步分配按钮对应的路由接口
@@ -179,7 +179,6 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 		}
 		if res := a.Raw(sql, authPostMountHasMenuButtonId).First(&tmp); res.Error == nil {
 		label1:
-			failTryTimes++
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
@@ -189,20 +188,22 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 				// 为当前节点继续分配g(group权限，设置部门继承关系)
 				return a.AssginCasbinAuthGroupToOrg(tmp.FrAuthOrgnizationPostId)
 			} else {
-				if failTryTimes <= 3 {
+				if failTryTimes <= 5 {
+					failTryTimes++
 					goto label1
 				}
 				resBool = false
 				variable.ZapLog.Error("AuthMenuAssignModel 发生错误", zap.Error(res.Error))
 			}
 		}
-
 	}
 	return resBool
 }
 
 // 给组织机构节点分配casbin的group（角色继承关系权限）
 func (a *AuthMenuAssignModel) AssginCasbinAuthGroupToOrg(orgId int) (resBool bool) {
+	// 参见 69 行注释
+	var failTryTimes = 1
 	resBool = true
 	sql := "SELECT path_info  FROM  tb_auth_organization_post WHERE   id =?"
 	var pathInfo string
@@ -211,17 +212,22 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthGroupToOrg(orgId int) (resBool boo
 			orgIdArray := strings.Split(pathInfo, ",")
 			orgLen := len(orgIdArray)
 			sql = `
-		INSERT   INTO tb_auth_casbin_rule (ptype,v0,v1,v2,v3,v4,v5) 
-		SELECT   'g',?,?,'','','',''  FROM   DUAL   
-		WHERE   NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a WHERE a.ptype='g' AND v0=? AND  v1=? FOR UPDATE )
-		`
+				INSERT   INTO tb_auth_casbin_rule (ptype,v0,v1,v2,v3,v4,v5) 
+				SELECT   'g',?,?,'','','',''  FROM   DUAL   
+				WHERE   NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a WHERE a.ptype='g' AND v0=? AND  v1=? FOR UPDATE )
+				`
 			var lastId = 0
 			var id = 0
 			var err error
 			for i := 1; i <= orgLen; i++ {
 				// 遍历组织机构id
 				if id, err = strconv.Atoi(orgIdArray[orgLen-i]); err == nil && i > 1 && id > 0 {
+				label:
 					if res = a.Exec(sql, lastId, id, lastId, id); res.Error != nil {
+						if failTryTimes <= 5 {
+							failTryTimes++
+							goto label
+						}
 						variable.ZapLog.Error("AuthMenuAssignModel 批量插入角色继承关系时出错", zap.Error(res.Error))
 						resBool = false
 					}
