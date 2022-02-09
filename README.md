@@ -64,6 +64,13 @@
 
 ### 版本更新日志
 
+#### V1.0.32 (2022-02-10)
+###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+* bug 修复
+- 1.大批量分配权限时会出现部分失败的情况。
+- 2.老版本增量升级：`app/model/users.go  139 行 对应的函数 OauthCheckTokenIsOk ` 覆盖老版本即可.  
+
+
 #### V1.0.31 (2022-02-05)
 ###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * bug 修复
