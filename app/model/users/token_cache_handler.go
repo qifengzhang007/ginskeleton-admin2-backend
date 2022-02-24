@@ -20,6 +20,11 @@ func (u *UsersModel) ValidTokenCacheToRedis(userId int64) {
 	sql := "SELECT   token,expires_at  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
+	defer func() {
+		//  凡是获取原生结果集的查询，记得释放记录集
+		_ = rows.Close()
+	}()
+
 	var tempToken, expires string
 	if err == nil && rows != nil {
 		for i := 1; rows.Next(); i++ {
@@ -36,8 +41,6 @@ func (u *UsersModel) ValidTokenCacheToRedis(userId int64) {
 				}
 			}
 		}
-		//  凡是获取原生结果集的查询，记得释放记录集
-		_ = rows.Close()
 	}
 	// 缓存结束之后删除超过系统设置最大在线数量的token
 	tokenCacheRedisFact.DelOverMaxOnlineCache()

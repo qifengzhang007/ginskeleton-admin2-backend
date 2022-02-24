@@ -69,16 +69,17 @@ func (u *UsersModel) Login(userName string, pass string) *UsersModel {
 
 //记录用户登陆（login）生成的token，每次登陆记录一次token
 func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64, clientIp string) bool {
-	// 异步缓存用户有效的token到redis
-	if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
-		go u.ValidTokenCacheToRedis(userId)
-	}
-
-	sql := "INSERT   INTO  `tb_oauth_access_tokens`(fr_user_id,`action_name`,token,expires_at,client_ip) " +
-		"SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  `tb_oauth_access_tokens` a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?)"
+	sql := `
+		INSERT   INTO  tb_oauth_access_tokens(fr_user_id,action_name,token,expires_at,client_ip) 
+		SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  tb_oauth_access_tokens a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?  )
+	`
 	//注意：token的精确度为秒，如果在一秒之内，一个账号多次调用接口生成的token其实是相同的，这样写入数据库，第二次的影响行数为0，知己实际上操作仍然是有效的。
 	//所以这里的判断影响行数>=0 都是正确的，只有 -1 才是执行失败、错误
 	if u.Exec(sql, userId, token, time.Unix(expiresAt, 0).Format(variable.DateFormat), clientIp, userId, token).Error == nil {
+		// 异步缓存用户有效的token到redis
+		if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
+			go u.ValidTokenCacheToRedis(userId)
+		}
 		return true
 	}
 	return false
