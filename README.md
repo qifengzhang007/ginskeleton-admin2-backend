@@ -92,6 +92,10 @@
 - 3.自带数据库文件更新，以便支持新增的个人信息编辑功能.
 - 4.所有底层依赖包更新至最新版.  
 
+#### V1.0.28 (2022-02-27)
+###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+- 1.`token` 缓存到 `redis` 逻辑加强严谨性.  
+
 #### V1.0.27 (2021-12-20)
 ###### 搭配的前端版本：>= [V1.0.22](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 - 1.错误日志记录时同时记录调用链信息。
