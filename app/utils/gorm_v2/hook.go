@@ -2,7 +2,6 @@ package gorm_v2
 
 import (
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"goskeleton/app/global/my_errors"
 	"goskeleton/app/global/variable"
@@ -29,13 +28,10 @@ func CreateBeforeHook(gormDB *gorm.DB) {
 			for i := 0; i < inLen; i++ {
 				row := destValueOf.Index(i)
 				if row.Type().Kind() == reflect.Struct {
-					fmt.Printf("切片成员结构体：%#+v\n", row)
 					if structHasSpecialField("CreatedAt", row) {
-						fmt.Printf("ok11111")
 						destValueOf.Index(i).FieldByName("CreatedAt").Set(reflect.ValueOf(time.Now().Format(variable.DateFormat)))
 					}
 					if structHasSpecialField("UpdatedAt", row) {
-						fmt.Printf("ok2222")
 						destValueOf.Index(i).FieldByName("UpdatedAt").Set(reflect.ValueOf(time.Now().Format(variable.DateFormat)))
 					}
 
@@ -83,7 +79,6 @@ func UpdateBeforeHook(gormDB *gorm.DB) {
 // structHasSpecialField  检查结构体是否有特定字段
 func structHasSpecialField(fieldName string, anyStructPtr interface{}) bool {
 	var tmp reflect.Type
-
 	if reflect.ValueOf(anyStructPtr).Elem().Kind() == reflect.Map {
 		destValueOf := reflect.ValueOf(anyStructPtr).Elem()
 		for _, item := range destValueOf.MapKeys() {
