@@ -79,7 +79,7 @@ func UpdateBeforeHook(gormDB *gorm.DB) {
 // structHasSpecialField  检查结构体是否有特定字段
 func structHasSpecialField(fieldName string, anyStructPtr interface{}) bool {
 	var tmp reflect.Type
-	if reflect.ValueOf(anyStructPtr).Elem().Kind() == reflect.Map {
+	if reflect.TypeOf(anyStructPtr).Kind() == reflect.Ptr && reflect.ValueOf(anyStructPtr).Elem().Kind() == reflect.Map {
 		destValueOf := reflect.ValueOf(anyStructPtr).Elem()
 		for _, item := range destValueOf.MapKeys() {
 			if item.String() == fieldName {
@@ -104,7 +104,6 @@ func structHasSpecialField(fieldName string, anyStructPtr interface{}) bool {
 			}
 		}
 	} else if reflect.TypeOf(anyStructPtr).Kind() == reflect.Struct {
-		// 处理结构体
 		destValueOf := anyStructPtr.(reflect.Value)
 		tf := destValueOf.Type()
 		for i := 0; i < tf.NumField(); i++ {
