@@ -64,6 +64,12 @@
 
 ### 版本更新日志
 
+#### V1.0.33 (2022-03-22)
+###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+* 细节完善
+- 1.gorm 相关的回调函数增强条件判断, 加强程序严谨性。
+- 2.自带数据库文件更新, 给字段设置了默认值.  
+
 #### V1.0.32 (2022-02-10)
 ###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * bug 修复
