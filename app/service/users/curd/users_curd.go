@@ -14,16 +14,16 @@ import (
 )
 
 func CreateUserCurdFactory() *UsersCurd {
-
-	return &UsersCurd{}
+	return &UsersCurd{users.CreateUserFactory("")}
 }
 
 type UsersCurd struct {
+	userModel *users.UsersModel
 }
 
 func (u *UsersCurd) Register(userName, pass, userIp string) bool {
 	pass = md5_encrypt.Base64Md5(pass) // 预先处理密码加密，然后存储在数据库
-	return users.CreateUserFactory("").Register(userName, pass, userIp)
+	return u.userModel.Register(userName, pass, userIp)
 }
 
 type userWithMenus struct {
@@ -35,7 +35,7 @@ type userWithMenus struct {
 func (u *UsersCurd) FindUserInfo(userId int64) *userWithMenus {
 	var data = &userWithMenus{}
 	var user *users.UsersModel = nil
-	user, _ = users.CreateUserFactory("").ShowOneItem(userId)
+	user, _ = u.userModel.ShowOneItem(userId)
 	data.UsersModel = *user
 	orgIds := u.getUserAllOrgIds(user.Id)
 	//根据岗位ID获取拥有的菜单ID,去重
@@ -84,7 +84,7 @@ func (u *UsersCurd) getUserAllOrgIds(userId int64) []int {
 // 查询用户打开指定的页面所拥有的按钮列表
 func (u *UsersCurd) GetButtonListByMenuId(userId, menuId int64) (r []users.UserHasButtons) {
 	orgIds := u.getUserAllOrgIds(userId)
-	if list := users.CreateUserFactory("").GetButtonListByMenuId(orgIds, menuId); len(list) > 0 {
+	if list := u.userModel.GetButtonListByMenuId(orgIds, menuId); len(list) > 0 {
 		return list
 	}
 	return nil
