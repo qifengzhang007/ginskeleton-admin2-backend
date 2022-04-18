@@ -18,12 +18,11 @@ func (a *ProvinceCityController) List(context *gin.Context) {
 	var limitStart = (context.GetFloat64(consts.ValidatorPrefix+"page") - 1) * limit
 
 	cityFac := province_city.CreateProvinceCityFactory("")
-	if counts := cityFac.GetCount(int(fid), name); counts > 0 {
-		res := cityFac.List(name, int(fid), int(limitStart), int(limit))
-		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": counts, "data": res})
-		return
+	if counts, lists := cityFac.List(name, int(fid), int(limitStart), int(limit)); counts > 0 {
+		response.Success(context, consts.CurdStatusOkMsg, gin.H{"count": counts, "data": lists})
+	} else {
+		response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
 	}
-	response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
 }
 
 // 1.根据fid查询子节点列表

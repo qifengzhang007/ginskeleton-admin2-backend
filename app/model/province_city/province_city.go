@@ -33,17 +33,22 @@ func (p *ProvinceCityModel) GetCount(fid int, name string) (count int64) {
 }
 
 //查询
-func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (list []ProvinceCityModel) {
-	sql := `
-		SELECT
-		id,  fid,name ,node_level ,status ,sort ,remark ,created_at , updated_at
-		FROM tb_province_city 
-		WHERE   fid= ? AND   name LIKE  ? ORDER  BY sort Desc, fid ASC ,id  ASC
-		LIMIT ? , ?;
+func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (counts int64, list []ProvinceCityModelList) {
+	if counts = p.GetCount(fid, name); counts > 0 {
+		sql := `
+			SELECT
+			a.id,  a.fid,b.name AS ftitle,a.name ,a.node_level ,a.status ,a.sort ,a.remark ,a.created_at , a.updated_at
+			FROM tb_province_city a  
+			LEFT  JOIN tb_province_city b  ON  a.fid=b.id
+			WHERE   a.fid= ? AND   a.name LIKE  ? ORDER  BY a.sort DESC, a.fid ASC ,a.id  ASC
+			LIMIT ? , ?
 	`
-	if res := p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list); res.Error != nil {
-		variable.ZapLog.Error("ProvinceCityModel 查询出错:", zap.Error(res.Error))
+		_ = p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list)
 	}
+
+	//if res := p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list); res.Error != nil {
+	//	variable.ZapLog.Error("ProvinceCityModel 查询出错:", zap.Error(res.Error))
+	//}
 	return
 }
 

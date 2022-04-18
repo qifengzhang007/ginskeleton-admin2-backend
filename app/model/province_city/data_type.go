@@ -16,3 +16,8 @@ type ProvinceCityTree struct {
 	HasSubNode int                `json:"has_sub_node"`
 	Children   []ProvinceCityTree `gorm:"-" json:"children"`
 }
+
+type ProvinceCityModelList struct {
+	ProvinceCityModel
+	Ftitle string `json:"ftitle"`
+}
