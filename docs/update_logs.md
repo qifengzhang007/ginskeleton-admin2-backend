@@ -1,6 +1,12 @@
 
 ### 版本更新历史日志
 
+#### V1.0.35  (2022-03-31)
+###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+* 细节完善
+- 1.rabbitmq 消息队列客户端掉线重连成功后，含有回调函数的旧协程及时释放.
+- 2.rabbitmq 消息队列相关的单元测试更新.
+
 #### V1.0.34  (2022-03-22)
 ###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * 细节完善

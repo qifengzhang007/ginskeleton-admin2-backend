@@ -65,9 +65,10 @@
 
 ### 版本更新日志
 
-#### V1.0.35  (2022-03-31)
-###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+#### V1.0.36  (2022-04-18)
+###### 搭配的前端版本：>= [V1.0.26](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * 细节完善
-- 1.rabbitmq 消息队列客户端掉线重连成功后，含有回调函数的旧协程及时释放.  
-- 2.rabbitmq 消息队列相关的单元测试更新.
+- 1.完善hook回调函数的细节：加强gorm字段在自定义字段名时回调函数的完善性.  
+- 2.省份城市查询代码精简.  
+
 - [更多更新日志](./docs/update_logs.md)
