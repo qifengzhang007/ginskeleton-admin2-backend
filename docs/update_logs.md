@@ -1,6 +1,12 @@
 
 ### 版本更新历史日志
 
+#### V1.0.36  (2022-04-18)
+###### 搭配的前端版本：>= [V1.0.26](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+* 细节完善
+- 1.完善hook回调函数的细节：加强gorm字段在自定义字段名时回调函数的完善性.
+- 2.省份城市查询代码精简.
+
 #### V1.0.35  (2022-03-31)
 ###### 搭配的前端版本：>= [V1.0.25](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * 细节完善
