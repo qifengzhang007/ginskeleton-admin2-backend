@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"goskeleton/app/global/consts"
 	"goskeleton/app/global/variable"
-	"goskeleton/app/http/controller/chaptcha"
+	"goskeleton/app/http/controller/captcha"
 	"goskeleton/app/http/controller/web"
 	"goskeleton/app/http/middleware/authorization"
 	"goskeleton/app/http/middleware/cors"
@@ -64,9 +64,9 @@ func InitWebRouter() *gin.Engine {
 	verifyCode := router.Group("captcha")
 	{
 		// 验证码业务，该业务无需专门校验参数，所以可以直接调用控制器
-		verifyCode.GET("/", (&chaptcha.Captcha{}).GenerateId)                          //  获取验证码ID
-		verifyCode.GET("/:captcha_id", (&chaptcha.Captcha{}).GetImg)                   // 获取图像地址
-		verifyCode.GET("/:captcha_id/:captcha_value", (&chaptcha.Captcha{}).CheckCode) // 校验验证码
+		verifyCode.GET("/", (&captcha.Captcha{}).GenerateId)                          //  获取验证码ID
+		verifyCode.GET("/:captcha_id", (&captcha.Captcha{}).GetImg)                   // 获取图像地址
+		verifyCode.GET("/:captcha_id/:captcha_value", (&captcha.Captcha{}).CheckCode) // 校验验证码
 	}
 	//  创建一个后端接口路由组
 	backend := router.Group("/admin/")
