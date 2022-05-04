@@ -1,6 +1,11 @@
 
 ### 版本更新历史日志
 
+#### V1.0.37  (2022-04-29)
+###### 搭配的前端版本：>= [V1.0.26](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
+*BUG 修复*
+- 1.修复验证码存在的线程安全问题。
+
 #### V1.0.36  (2022-04-18)
 ###### 搭配的前端版本：>= [V1.0.26](http://gitee.com/daitougege/gin-skeleton-admin-frontend)
 * 细节完善
