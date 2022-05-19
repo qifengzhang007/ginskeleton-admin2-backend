@@ -41,7 +41,7 @@ func Fail(c *gin.Context, dataCode int, msg string, data interface{}) {
 
 // token 基本的格式错误
 func ErrorTokenBaseInfo(c *gin.Context) {
-	ReturnJson(c, http.StatusBadRequest, http.StatusBadRequest, my_errors.ErrorsTokenBaseInfo, "")
+	ReturnJson(c, http.StatusUnauthorized, http.StatusUnauthorized, my_errors.ErrorsTokenBaseInfo, "")
 	//终止可能已经被加载的其他回调函数的执行
 	c.Abort()
 }
@@ -55,8 +55,14 @@ func ErrorTokenAuthFail(c *gin.Context) {
 
 //token 不符合刷新条件
 func ErrorTokenRefreshFail(c *gin.Context) {
-	ReturnJson(c, http.StatusBadRequest, http.StatusBadRequest, my_errors.ErrorsRefreshTokenFail, "")
+	ReturnJson(c, http.StatusUnauthorized, http.StatusBadRequest, my_errors.ErrorsRefreshTokenFail, "")
 	//终止可能已经被加载的其他回调函数的执行
+	c.Abort()
+}
+
+//token 参数校验错误
+func TokenErrorParam(c *gin.Context, wrongParam interface{}) {
+	ReturnJson(c, http.StatusUnauthorized, consts.ValidatorParamsCheckFailCode, consts.ValidatorParamsCheckFailMsg, wrongParam)
 	c.Abort()
 }
 
