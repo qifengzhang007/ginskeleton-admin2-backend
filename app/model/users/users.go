@@ -20,7 +20,7 @@ func CreateUserFactory(sqlType string) *UsersModel {
 type UsersModel struct {
 	model.BaseModel
 	UserName    string `gorm:"column:user_name" json:"user_name"`
-	Pass        string `json:"pass"`
+	Pass        string `json:"-"`
 	Phone       string `json:"phone"`
 	RealName    string `gorm:"column:real_name" json:"real_name"`
 	Status      int    `json:"status"`
@@ -173,7 +173,7 @@ func (u *UsersModel) SetTokenInvalid(userId int) bool {
 
 //根据用户ID查询一条信息
 func (u *UsersModel) ShowOneItem(userId int64) (*UsersModel, error) {
-	sql := "SELECT  `id`, `user_name`,`pass`, `real_name`, `login_times`,`phone`, `avatar`,`status`,created_at,updated_at FROM  `tb_users`  WHERE `status`=1 and   id=? LIMIT 1"
+	sql := "SELECT  `id`, `user_name`,`real_name`, `login_times`,`phone`, `avatar`,`status`,created_at,updated_at FROM  `tb_users`  WHERE `status`=1 and   id=? LIMIT 1"
 	result := u.Raw(sql, userId).First(u)
 	if result.Error == nil {
 		return u, nil
