@@ -39,15 +39,15 @@ func (u *UsersCurd) FindUserInfo(userId int64) *userWithMenus {
 	data.UsersModel = *user
 	orgIds := u.getUserAllOrgIds(user.Id)
 	//根据岗位ID获取拥有的菜单ID,去重
-	meunIdModel := modeAuth.CreateAuthPostMountHasMenuModelFactory("").GetByIds(orgIds)
-	meunIdArr := []int{}
-	for k, _ := range meunIdModel {
-		meunIdArr = append(meunIdArr, meunIdModel[k].FrAuthSystemMenuId)
+	menuIdModel := modeAuth.CreateAuthPostMountHasMenuModelFactory("").GetByIds(orgIds)
+	menuIdArray := []int{}
+	for k, _ := range menuIdModel {
+		menuIdArray = append(menuIdArray, menuIdModel[k].FrAuthSystemMenuId)
 	}
 
-	//根据菜单ID获取菜单信息
+	//根据菜单 Ids数组 获取菜单信息
 
-	menus := modeAuth.CreateAuthSystemMenuFactory("").GetByIds(meunIdArr)
+	menus := modeAuth.CreateAuthSystemMenuFactory("").GetByIds(menuIdArray)
 	var dest = make([]modeAuth.AuthSystemMenuTree, 0)
 	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(menus, &dest); err != nil {
 		variable.ZapLog.Error("根据用户id查询权限范围内的菜单数据树形化出错", zap.Error(err))

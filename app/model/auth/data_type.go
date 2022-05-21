@@ -124,11 +124,10 @@ type AuthSystemMenuTree struct {
 	Fid        int                  `json:"fid" fid:"Id"`
 	Title      string               `json:"title"`
 	Name       string               `json:"name"`
-	Loading    bool                 `gorm:"-" json:"loading"`
 	Icon       string               `gorm:"icon" json:"icon"`
 	Path       string               `gorm:"path" json:"path"`
+	NodeLevel  int                  `json:"node_level"`
 	Component  string               `json:"component"`
-	Remark     string               `json:"remark"`
 	HasSubNode int                  `json:"has_sub_node"`
 	Children   []AuthSystemMenuTree `gorm:"-" json:"children"`
 }

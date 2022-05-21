@@ -42,9 +42,9 @@ func (u *Users) Login(context *gin.Context) {
 		if userToken, err := userTokenFactory.GenerateToken(userModel.Id, userModel.UserName, userModel.Phone, variable.ConfigYml.GetInt64("Token.JwtTokenCreatedExpireAt")); err == nil {
 			if userTokenFactory.RecordLoginToken(userToken, context.ClientIP()) {
 				data := gin.H{
-					"userId":     userModel.Id,
+					"id":         userModel.Id,
 					"user_name":  userName,
-					"realName":   userModel.RealName,
+					"real_name":  userModel.RealName,
 					"phone":      phone,
 					"token":      userToken,
 					"updated_at": time.Now().Format(variable.DateFormat),
