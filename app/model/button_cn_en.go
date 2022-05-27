@@ -41,8 +41,10 @@ func (b *ButtonCnEnModel) getCounts(keyWords string) (counts int64) {
 func (b *ButtonCnEnModel) Show(keyWords string, limitStart, limitItems int) (totalCounts int64, temp []ButtonCnEnModel) {
 	totalCounts = b.getCounts(keyWords)
 	if totalCounts > 0 {
-		sql := "SELECT  `id`, `cn_name`,`allow_method`, `en_name`, `remark`, created_at," +
-			"  updated_at   FROM  `tb_auth_button_cn_en`  WHERE  ( cn_name like ? or en_name like  ?) LIMIT ?,?"
+		sql := `
+			SELECT  a.id, a.cn_name,a.allow_method, a.en_name, a.remark, a.created_at,  a.updated_at   
+			FROM  tb_auth_button_cn_en a  WHERE  ( a.cn_name LIKE ? OR a.en_name LIKE  ?) LIMIT ?,?
+		`
 		if res := b.Raw(sql, "%"+keyWords+"%", "%"+keyWords+"%", limitStart, limitItems).Find(&temp); res.RowsAffected > 0 {
 			return totalCounts, temp
 		} else {
@@ -65,7 +67,7 @@ func (a *ButtonCnEnModel) List(cnName string, limitStart, limit int) (counts int
 	counts = a.getCountsByButtonName(cnName)
 	if counts > 0 {
 		if err := a.Model(a).
-			Select("id", "en_name", "cn_name", "allow_method", "color", "status", "cn_name", "remark", "DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s')  as created_at", "DATE_FORMAT(updated_at,'%Y-%m-%d %H:%i:%s')  as updated_at").
+			Select("id", "en_name", "cn_name", "allow_method", "color", "status", "cn_name", "remark", "created_at", "updated_at").
 			Where("cn_name like ?", "%"+cnName+"%").Offset(limitStart).Limit(limit).Find(&data); err.Error == nil {
 			return
 		}

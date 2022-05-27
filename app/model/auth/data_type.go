@@ -43,15 +43,14 @@ type OrgTree struct {
 // 组织机构数据结构
 
 type AuthOrganizationPostTree struct {
-	Id         int                        `json:"id"`
-	Fid        string                     `json:"fid"`
-	Title      string                     `form:"fid" json:"title"`
-	Loading    bool                       `gorm:"-" json:"loading"`
-	Status     string                     `gorm:"-" json:"status"`
-	PathInfo   string                     `json:"path_info"`
-	Remark     string                     `json:"remark"`
-	HasSubNode int                        `json:"has_sub_node"`
-	Children   []AuthOrganizationPostTree `gorm:"-" json:"children"`
+	Id       int                        `json:"id"`
+	Fid      string                     `json:"fid"`
+	Title    string                     `json:"title"`
+	Status   string                     `json:"status"`
+	PathInfo string                     `json:"path_info"`
+	Remark   string                     `json:"remark"`
+	IsLeaf   bool                       `json:"is_leaf"` // 是否为叶子节点
+	Children []AuthOrganizationPostTree `gorm:"-" json:"children"`
 }
 
 // 根据ids查询数据列表

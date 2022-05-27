@@ -71,14 +71,14 @@ func (a *AuthOrganizationPostModel) updatePathInfoNodeLevel(curItemid int) bool 
 	return false
 }
 
-func (a *AuthOrganizationPostModel) GetByFid(fid int, data *[]AuthOrganizationPostTree) (err error) {
+func (a *AuthOrganizationPostModel) GetByFid(fid int) (data []AuthOrganizationPostTree, err error) {
 	sql := `
 		SELECT  
-		id,fid,title, STATUS,path_info,remark ,
-		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_auth_organization_post  WHERE  fid=a.id ) AS  has_sub_node
+		id,fid,title, status,path_info,remark ,
+		(SELECT  CASE  WHEN  COUNT(*) =0 THEN 1 ELSE  0 END  FROM tb_auth_organization_post  WHERE  fid=a.id ) AS  is_leaf
 		FROM   tb_auth_organization_post  a  WHERE  fid=?
 	`
-	err = a.Raw(sql, fid).Scan(data).Error
+	err = a.Raw(sql, fid).Scan(&data).Error
 	return
 }
 

@@ -33,22 +33,17 @@ func (p *ProvinceCityModel) GetCount(fid int, name string) (count int64) {
 }
 
 //查询
-func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (counts int64, list []ProvinceCityModelList) {
+func (p *ProvinceCityModel) List(name string, fid, limitStart, limit int) (counts int64, list []ProvinceCityModel) {
 	if counts = p.GetCount(fid, name); counts > 0 {
 		sql := `
 			SELECT
-			a.id,  a.fid,b.name AS ftitle,a.name ,a.node_level ,a.status ,a.sort ,a.remark ,a.created_at , a.updated_at
-			FROM tb_province_city a  
-			LEFT  JOIN tb_province_city b  ON  a.fid=b.id
+			a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark ,a.created_at , a.updated_at
+			FROM tb_province_city a
 			WHERE   a.fid= ? AND   a.name LIKE  ? ORDER  BY a.sort DESC, a.fid ASC ,a.id  ASC
 			LIMIT ? , ?
 	`
 		_ = p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list)
 	}
-
-	//if res := p.Raw(sql, fid, "%"+name+"%", limitStart, limit).Find(&list); res.Error != nil {
-	//	variable.ZapLog.Error("ProvinceCityModel 查询出错:", zap.Error(res.Error))
-	//}
 	return
 }
 
@@ -57,21 +52,12 @@ func (p *ProvinceCityModel) GetSubListByfid(fid int) []ProvinceCityTree {
 	sql := `
 		SELECT
 		a.id,  a.fid,a.name ,a.node_level ,a.status ,a.sort ,a.remark , a.created_at , a.updated_at,
-		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_province_city  WHERE  fid=a.id ) AS  has_sub_node
+		(SELECT  CASE  WHEN  COUNT(*) =0 THEN 1 ELSE  0 END  FROM tb_province_city  WHERE  fid=a.id ) AS  is_leaf
 		FROM tb_province_city a
 		WHERE   fid= ?
 	`
 	var inSlice []ProvinceCityTree
 	if res := p.Raw(sql, fid).Find(&inSlice); res.Error == nil && len(inSlice) > 0 {
-		for index, val := range inSlice {
-			// 按照 iview 框架异步渲染数据所需要的 children 值设置为 nil 或者  []
-			if val.HasSubNode == 0 {
-				val.Children = nil
-			} else {
-				val.Children = make([]ProvinceCityTree, 0)
-			}
-			inSlice[index] = val
-		}
 		return inSlice
 	} else if res.Error != nil {
 		variable.ZapLog.Error("ProvinceCityModel 根据fid查询子级出错:", zap.Error(res.Error))

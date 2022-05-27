@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
 	modeAuth "goskeleton/app/model/auth"
-	"goskeleton/app/service/auth_organization_post"
 	"goskeleton/app/service/auth_post_members"
 	"goskeleton/app/utils/response"
 )
@@ -40,7 +39,7 @@ func (a *OrganizationPostController) Create(c *gin.Context) {
 // 1.根据ID获取子节点
 func (a *OrganizationPostController) GetByFid(c *gin.Context) {
 	fid := c.GetFloat64(consts.ValidatorPrefix + "fid")
-	err, data := (&auth_organization_post.AuthOrganizationPostService{}).GetOrgByFid(int(fid))
+	data, err := modeAuth.CreateAuthOrganizationFactory("").GetByFid(int(fid))
 	if err != nil {
 		response.Fail(c, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, err)
 	} else {
