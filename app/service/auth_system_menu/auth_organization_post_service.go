@@ -14,17 +14,18 @@ import (
 type AuthSystemMenuService struct {
 }
 
-func (a *AuthSystemMenuService) GetOrgByFid(fid int) (err error, data []auth.AuthSystemMenuTree) {
-	models := auth.CreateAuthSystemMenuFactory("")
-	err = models.GetByFid(fid, &data)
-	for key, value := range data {
-		if value.HasSubNode > 0 {
-			value.Children = []auth.AuthSystemMenuTree{}
-			data[key] = value
-		}
-	}
-	return
-}
+//
+//func (a *AuthSystemMenuService) GetOrgByFid(fid int) (err error, data []auth.AuthSystemMenuTree) {
+//	//models := auth.CreateAuthSystemMenuFactory("")
+//	//err = models.GetByFid(fid, &data)
+//	//for key, value := range data {
+//	//	if value.HasSubNode > 0 {
+//	//		value.Children = []auth.AuthSystemMenuTree{}
+//	//		data[key] = value
+//	//	}
+//	//}
+//	return
+//}
 
 // 待分配系统菜单、mmodel、按钮树形化
 func (a *AuthSystemMenuService) SystemMenuButtonToTree(sqlRes []auth.AuthSystemMenuButton) []MenuListTree {
@@ -55,7 +56,7 @@ func (a *AuthSystemMenuService) ButtonStringToArray(jsonStr string) []map[string
 	return mSlice
 }
 
-//讲按钮循环加入表中
+//将按钮循环加入表中
 //处理按钮字符串
 func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64) bool {
 	if menuButtonList, isOk := context.MustGet(variable.SystemCreateKey).(data_type.MenuCreate); isOk {
@@ -75,7 +76,7 @@ func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64)
 	return false
 }
 
-//讲按钮循环加入表中
+//将按钮循环加入表中
 //处理按钮字符串
 func (a *AuthSystemMenuService) UpdateButton(context *gin.Context, menuId int64) bool {
 	if menuButtonList, isOk := context.MustGet(variable.SystemEditKey).(data_type.MenuEdit); isOk {

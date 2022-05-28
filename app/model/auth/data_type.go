@@ -128,6 +128,7 @@ type AuthSystemMenuTree struct {
 	NodeLevel  int                  `json:"node_level"`
 	Component  string               `json:"component"`
 	HasSubNode int                  `json:"has_sub_node"`
+	IsLeaf     bool                 `json:"is_leaf"`
 	Children   []AuthSystemMenuTree `gorm:"-" json:"children"`
 }
 

@@ -68,14 +68,15 @@ func (a *AuthSystemMenuModel) List(limitStart int, limit int, fid int, title str
 }
 
 // 通过fid查询子节点数据
-func (a *AuthSystemMenuModel) GetByFid(fid int, data *[]AuthSystemMenuTree) (err error) {
+func (a *AuthSystemMenuModel) GetByFid(fid int) (data []AuthSystemMenuTree, err error) {
 	sql := `
 		SELECT  
 		id,fid,title,name, icon,path,component,remark ,
-		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_auth_system_menu  WHERE  fid=a.id ) AS  has_sub_node
+		(SELECT  CASE  WHEN  COUNT(*) >0 THEN 1 ELSE  0 END  FROM tb_auth_system_menu  WHERE  fid=a.id ) AS  has_sub_node,
+		(SELECT  CASE  WHEN  COUNT(*) =0 THEN 1 ELSE  0 END  FROM tb_auth_system_menu  WHERE  fid=a.id ) AS  is_leaf
 		FROM   tb_auth_system_menu  a  WHERE  fid=?
 	`
-	err = a.Raw(sql, fid).Scan(data).Error
+	err = a.Raw(sql, fid).Scan(&data).Error
 	return
 }
 

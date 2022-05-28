@@ -29,7 +29,7 @@ func (a *SystemMenuController) List(context *gin.Context) {
 // 根据ID获取子节点
 func (a *SystemMenuController) GetByFid(c *gin.Context) {
 	fid := c.GetFloat64(consts.ValidatorPrefix + "fid")
-	err, data := (&auth_system_menu.AuthSystemMenuService{}).GetOrgByFid(int(fid))
+	data, err := modeAuth.CreateAuthSystemMenuFactory("").GetByFid(int(fid))
 	if err == nil {
 		response.Success(c, consts.CurdStatusOkMsg, data)
 	} else {
