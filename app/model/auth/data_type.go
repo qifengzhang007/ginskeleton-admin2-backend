@@ -32,9 +32,9 @@ type AssignedSystemMenuButton struct {
 
 // 根据用户id查询已经分配的权限树形结构
 type OrgTree struct {
-	Id       int       `primaryKey:"yes"`
+	Id       int       ` json:"id" primaryKey:"yes"`
 	OrgTitle string    `json:"title"`
-	OrgFid   int       `fid:"Id"`
+	OrgFid   int       `json:"org_fid" fid:"Id"`
 	NodeType string    `json:"node_type"`
 	Expand   bool      `json:"expand"`
 	Children []OrgTree `gorm:"-" json:"children"`

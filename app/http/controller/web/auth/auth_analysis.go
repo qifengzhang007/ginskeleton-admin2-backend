@@ -30,9 +30,13 @@ func (a *AuthAnalysis) ListWithPost(context *gin.Context) {
 }
 
 //根据用户ID获取所有权限的来源
-func (a *AuthAnalysis) GetAuthByUserId(c *gin.Context) {
-	id := c.GetFloat64(consts.ValidatorPrefix + "id")
+func (a *AuthAnalysis) GetAuthByUserId(context *gin.Context) {
+	id := context.GetFloat64(consts.ValidatorPrefix + "id")
 	//根据用户ID,查询隶属哪些组织机构
-	data := (&auth_post_members.AuthPostMembersService{}).FindOrgs(int64(id))
-	response.Success(c, consts.CurdStatusOkMsg, data)
+	if data := (&auth_post_members.AuthPostMembersService{}).FindOrgs(int64(id)); data != nil {
+		response.Success(context, consts.CurdStatusOkMsg, data)
+	} else {
+		response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
+	}
+
 }
