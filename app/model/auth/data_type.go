@@ -139,8 +139,8 @@ type SystemMenuButtonList struct {
 	FrAuthSystemMenuId int    `json:"fr_auth_system_menu_id"`
 	FrAuthButtonCnEnId int    `json:"fr_auth_button_cn_en_id"`
 	ButtonName         string `json:"button_name"`
-	RequestMethod      string `json:"request_method"`
 	RequestUrl         string `json:"request_url"`
+	RequestMethod      string `json:"request_method"`
 	Status             int    `json:"status"`
 	Remark             string `json:"remark"`
 }

@@ -41,7 +41,7 @@ func (a *SystemMenuController) GetByFid(c *gin.Context) {
 // 获取菜单下的Button信息
 func (a *SystemMenuController) GetMountButtonList(c *gin.Context) {
 	menuId := c.GetFloat64(consts.ValidatorPrefix + "fr_auth_system_menu_id")
-	data := modeAuth.CreateAuthSystemMenuButtonFactory("").MenuButton(menuId)
+	data := modeAuth.CreateAuthSystemMenuButtonFactory("").MenuButton(int(menuId))
 	response.Success(c, consts.CurdStatusOkMsg, data)
 }
 

@@ -147,11 +147,12 @@ func (a *AuthSystemMenuButtonModel) InsertMap(data map[string]interface{}) bool 
 }
 
 //根据菜单ID获取按钮信息
-func (a *AuthSystemMenuButtonModel) MenuButton(menuId float64) (data []SystemMenuButtonList) {
-	m := a.Table("tb_auth_system_menu_button a")
-	m.Joins("left join tb_auth_button_cn_en b on a.fr_auth_button_cn_en_id = b.id").
-		Where("a.fr_auth_system_menu_id = ?", menuId).
-		Select("a.*,b.cn_name as button_name").Scan(&data)
+func (a *AuthSystemMenuButtonModel) MenuButton(menuId int) (data []SystemMenuButtonList) {
+	sql := `
+		SELECT a.fr_auth_button_cn_en_id,a.fr_auth_system_menu_id, a.id,a.remark, a.request_url, a.request_method, a.status, b.cn_name as button_name 
+		FROM tb_auth_system_menu_button a left join tb_auth_button_cn_en b on a.fr_auth_button_cn_en_id = b.id WHERE a.fr_auth_system_menu_id = ?
+	`
+	a.Raw(sql, menuId).Scan(&data)
 	return
 }
 
