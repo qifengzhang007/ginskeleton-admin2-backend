@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"goskeleton/app/global/variable"
@@ -20,7 +21,7 @@ func CreateUserFactory(sqlType string) *UsersModel {
 type UsersModel struct {
 	model.BaseModel
 	UserName    string `gorm:"column:user_name" json:"user_name"`
-	Pass        string `json:"-"`
+	Pass        string `json:"pass"`
 	Phone       string `json:"phone"`
 	RealName    string `gorm:"column:real_name" json:"real_name"`
 	Status      int    `json:"status"`
@@ -173,7 +174,7 @@ func (u *UsersModel) SetTokenInvalid(userId int) bool {
 
 //根据用户ID查询一条信息
 func (u *UsersModel) ShowOneItem(userId int64) (*UsersModel, error) {
-	sql := "SELECT  `id`, `user_name`,`real_name`, `login_times`,`phone`, `avatar`,`status`,created_at,updated_at FROM  `tb_users`  WHERE `status`=1 and   id=? LIMIT 1"
+	sql := "SELECT  a.id, a.user_name,a.real_name, a.login_times,a.phone, a.avatar,a.status,a.login_times,a.remark,a.created_at,a.updated_at FROM  tb_users  a  WHERE a.status=1 and   a.id=? LIMIT 1"
 	result := u.Raw(sql, userId).First(u)
 	if result.Error == nil {
 		return u, nil
@@ -285,9 +286,10 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 			// 系统默认虚拟密码，不对真实业务做任何处理
 			tmp.Pass = ""
 		} else {
+			fmt.Printf("修改密码收集到的上下文参数：%#+v\n", tmp)
 			tmp.Pass = md5_encrypt.Base64Md5(tmp.Pass)
 			tmp.LastLoginIp = c.ClientIP()
-
+			fmt.Printf("密码加密后的tmp：%#+v\n", tmp)
 			// 如果用户密码被修改，那么redis中的token值也清除
 			if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
 				go u.DelTokenCacheFromRedis(tmp.Id)
@@ -297,7 +299,7 @@ func (u *UsersModel) UpdateData(c *gin.Context) bool {
 		// omit 忽略指定字段
 		if len(tmp.Pass) > 0 {
 			if u.OauthResetToken(tmp.Id, tmp.Pass, tmp.LastLoginIp) {
-				if res := u.Omit("CreatedAt").Save(&tmp); res.Error == nil {
+				if res := u.Debug().Omit("CreatedAt").Save(&tmp); res.Error == nil {
 					return true
 				} else {
 					variable.ZapLog.Error("UsersModel 数据更更新出错", zap.Error(res.Error))

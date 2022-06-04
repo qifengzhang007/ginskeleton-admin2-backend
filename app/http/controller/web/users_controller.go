@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
 	"goskeleton/app/global/variable"
@@ -8,6 +9,7 @@ import (
 	"goskeleton/app/model/users"
 	"goskeleton/app/service/users/curd"
 	userstoken "goskeleton/app/service/users/token"
+	"goskeleton/app/utils/cur_userinfo"
 	"goskeleton/app/utils/response"
 	"time"
 )
@@ -36,7 +38,7 @@ func (u *Users) Login(context *gin.Context) {
 	pass := context.GetString(consts.ValidatorPrefix + "pass")
 	phone := context.GetString(consts.ValidatorPrefix + "phone")
 	userModel := users.CreateUserFactory("").Login(userName, pass)
-
+	fmt.Println("收到的参数：", userName, pass)
 	if userModel != nil {
 		userTokenFactory := userstoken.CreateUserFactory()
 		if userToken, err := userTokenFactory.GenerateToken(userModel.Id, userModel.UserName, userModel.Phone, variable.ConfigYml.GetInt64("Token.JwtTokenCreatedExpireAt")); err == nil {
@@ -52,6 +54,8 @@ func (u *Users) Login(context *gin.Context) {
 				response.Success(context, consts.CurdStatusOkMsg, data)
 				return
 			}
+		} else {
+			fmt.Println("生成token出错：", err.Error())
 		}
 	}
 	response.Fail(context, consts.CurdLoginFailCode, consts.CurdLoginFailMsg, "")
@@ -173,22 +177,20 @@ func (u *Users) GetButtonListByMenuId(context *gin.Context) {
 
 // GetPersonalInfo 每个用户查询自己的个人信息
 func (u *Users) GetPersonalInfo(context *gin.Context) {
-	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
-	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
-	if !exist {
+	userId, exists := cur_userinfo.GetCurrentUserId(context)
+	if !exists {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
 	} else {
-		user, _ := users.CreateUserFactory("").ShowOneItem(currentUser.UserId)
-		user.Pass = "" // pass 设置为空，不给前台展示
+		user, _ := users.CreateUserFactory("").ShowOneItem(userId)
 		response.Success(context, consts.CurdStatusOkMsg, user)
 	}
 }
 
 // EditPersonalInfo 编辑自己的信息
 func (u *Users) EditPersonalInfo(context *gin.Context) {
-	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
-	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
-	if !exist {
+	// 获取当前请求用户id
+	userId, exists := cur_userinfo.GetCurrentUserId(context)
+	if !exists {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
 	} else {
 
@@ -196,12 +198,12 @@ func (u *Users) EditPersonalInfo(context *gin.Context) {
 		usersModel := users.CreateUserFactory("")
 
 		// 检查正在修改的用户名是否被其他站使用
-		if usersModel.UpdateDataCheckUserNameIsUsed(int(currentUser.UserId), userName) > 0 {
+		if usersModel.UpdateDataCheckUserNameIsUsed(int(userId), userName) > 0 {
 			response.Fail(context, consts.CurdUpdateFailCode, consts.CurdUpdateFailMsg+",该用户名: "+userName+" 已经被其他人占用", "")
 			return
 		}
 		// 这里使用token解析的id更新表单参数里面的id，加固安全
-		context.Set(consts.ValidatorPrefix+"id", float64(currentUser.UserId))
+		context.Set(consts.ValidatorPrefix+"id", float64(userId))
 
 		if usersModel.UpdateData(context) {
 			response.Success(context, consts.CurdStatusOkMsg, "")
