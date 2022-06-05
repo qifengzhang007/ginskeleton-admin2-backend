@@ -1,11 +1,11 @@
 Gormv2: # 只针对 gorm  操作数据库有效
-  UseDbType: "mysql"
+  UseDbType: "mysql"   # admin 系统目前只支持mysql数据库，请勿修改为其他数据库
   Mysql:
     IsInitGolobalGormMysql: 1    # 随项目启动为gorm db初始化一个全局 variable.GormDbMysql（完全等于*gorm.Db）,正确配置数据库，该值必须设置为: 1
     SlowThreshold: 30            # 慢 SQL 阈值(sql执行时间超过此时间单位（秒），就会触发系统日志记录)
     Write:
       Host: "127.0.0.1"
-      DataBase: "db_ginskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 3306
       Prefix: "tb_"   #  目前没有用到该配置项
       User: "root"
@@ -19,7 +19,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     IsOpenReadDb: 0                     # 是否开启读写分离配置（1=开启、0=关闭），IsOpenReadDb=1,Read 部分参数有效，否则Read部分参数直接忽略
     Read:
       Host: "192.168.8.62"
-      DataBase: "db_ginskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 3306                        #注意，非3306，请自行调整
       Prefix: "tb_"
       User: "root"
@@ -34,7 +34,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     SlowThreshold: 30
     Write:
       Host: "127.0.0.1"
-      DataBase: "db_goskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 1433
       Prefix: "tb_"
       User: "Sa"
@@ -47,7 +47,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     IsOpenReadDb: 0            # 是否开启读写分离配置（1=开启、0=关闭），IsOpenReadDb=1,Read  部分参数有效，否则Read部分参数直接忽略
     Read:
       Host: "127.0.0.1"
-      DataBase: "db_goskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 1433
       Prefix: "tb_"
       User: "Sa"
@@ -61,7 +61,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     SlowThreshold: 30
     Write:
       Host: "127.0.0.1"
-      DataBase: "db_goskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 5432
       Prefix: "tb_"
       User: "postgres"
@@ -74,7 +74,7 @@ Gormv2: # 只针对 gorm  操作数据库有效
     IsOpenReadDb: 0            # 是否开启读写分离配置（1=开启、0=关闭），IsOpenReadDb=1,Read  部分参数有效，否则Read部分参数直接忽略
     Read:
       Host: "127.0.0.1"
-      DataBase: "db_goskeleton"
+      DataBase: "db_ginskeleton2"
       Port: 5432
       Prefix: "tb_"
       User: "postgres"
