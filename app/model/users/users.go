@@ -71,8 +71,8 @@ func (u *UsersModel) Login(userName string, pass string) *UsersModel {
 //记录用户登陆（login）生成的token，每次登陆记录一次token
 func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64, clientIp string) bool {
 	sql := `
-		INSERT   INTO  tb_oauth_access_tokens(fr_user_id,action_name,token,expires_at,client_ip) 
-		SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  tb_oauth_access_tokens a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?  )
+		INSERT   INTO  tb_auth_access_tokens(fr_user_id,action_name,token,expires_at,client_ip) 
+		SELECT  ?,'login',? ,?,? FROM DUAL    WHERE   NOT   EXISTS(SELECT  1  FROM  tb_auth_access_tokens a WHERE  a.fr_user_id=?  AND a.action_name='login' AND a.token=?  )
 	`
 	//注意：token的精确度为秒，如果在一秒之内，一个账号多次调用接口生成的token其实是相同的，这样写入数据库，第二次的影响行数为0，知己实际上操作仍然是有效的。
 	//所以这里的判断影响行数>=0 都是正确的，只有 -1 才是执行失败、错误
@@ -90,7 +90,7 @@ func (u *UsersModel) OauthLoginToken(userId int64, token string, expiresAt int64
 func (u *UsersModel) OauthRefreshConditionCheck(userId int64, oldToken string) bool {
 	// 首先判断旧token在本系统自带的数据库已经存在，才允许继续执行刷新逻辑
 	var oldTokenIsExists int
-	sql := "SELECT count(*)  as  counts FROM tb_oauth_access_tokens  WHERE fr_user_id =? and token=? and NOW()<DATE_ADD(expires_at,INTERVAL  ? SECOND)"
+	sql := "SELECT count(*)  as  counts FROM tb_auth_access_tokens  WHERE fr_user_id =? and token=? and NOW()<DATE_ADD(expires_at,INTERVAL  ? SECOND)"
 	if u.Raw(sql, userId, oldToken, variable.ConfigYml.GetInt64("Token.JwtTokenRefreshAllowSec")).First(&oldTokenIsExists).Error == nil && oldTokenIsExists == 1 {
 		return true
 	}
@@ -99,7 +99,7 @@ func (u *UsersModel) OauthRefreshConditionCheck(userId int64, oldToken string) b
 
 //用户刷新token
 func (u *UsersModel) OauthRefreshToken(userId, expiresAt int64, oldToken, newToken, clientIp string) bool {
-	sql := "UPDATE   tb_oauth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
+	sql := "UPDATE   tb_auth_access_tokens   SET  token=? ,expires_at=?,client_ip=?,updated_at=NOW(),action_name='refresh'  WHERE   fr_user_id=? AND token=?"
 	if u.Exec(sql, newToken, time.Unix(expiresAt, 0).Format(variable.DateFormat), clientIp, userId, oldToken).Error == nil {
 		// 异步缓存用户有效的token到redis
 		if variable.ConfigYml.GetInt("Token.IsCacheToRedis") == 1 {
@@ -118,7 +118,7 @@ func (u *UsersModel) OauthResetToken(userId int64, newPass, clientIp string) boo
 		return true
 	} else if userItem != nil {
 		maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
-		sql := "UPDATE  tb_oauth_access_tokens  SET  revoked=1,updated_at=NOW(),action_name='ResetPass',client_ip=?  WHERE  fr_user_id=? AND revoked=0 ORDER BY id DESC LIMIT ?  "
+		sql := "UPDATE  tb_auth_access_tokens  SET  revoked=1,updated_at=NOW(),action_name='ResetPass',client_ip=?  WHERE  fr_user_id=? AND revoked=0 ORDER BY id DESC LIMIT ?  "
 		if u.Exec(sql, clientIp, userId, maxOnlineUsers).Error == nil {
 			return true
 		}
@@ -129,7 +129,7 @@ func (u *UsersModel) OauthResetToken(userId int64, newPass, clientIp string) boo
 //当tb_users 删除数据，相关的token同步删除
 func (u *UsersModel) OauthDestroyToken(userId int) bool {
 	//如果用户新旧密码一致，直接返回true，不需要处理
-	sql := "DELETE FROM  tb_oauth_access_tokens WHERE  fr_user_id=?  "
+	sql := "DELETE FROM  tb_auth_access_tokens WHERE  fr_user_id=?  "
 	//判断>=0, 有些没有登录过的用户没有相关token，此语句执行影响行数为0，但是仍然是执行成功
 	if u.Exec(sql, userId).Error == nil {
 		return true
@@ -139,7 +139,7 @@ func (u *UsersModel) OauthDestroyToken(userId int) bool {
 
 // 判断用户token是否在数据库存在+状态OK
 func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
-	sql := "SELECT   token  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
+	sql := "SELECT   token  FROM  `tb_auth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
 	defer func() {
@@ -160,10 +160,10 @@ func (u *UsersModel) OauthCheckTokenIsOk(userId int64, token string) bool {
 	return false
 }
 
-// 禁用一个用户的: 1.tb_users表的 status 设置为 0，tb_oauth_access_tokens 表的所有token删除
+// 禁用一个用户的: 1.tb_users表的 status 设置为 0，tb_auth_access_tokens 表的所有token删除
 // 禁用一个用户的token请求（本质上就是把tb_users表的 status 字段设置为 0 即可）
 func (u *UsersModel) SetTokenInvalid(userId int) bool {
-	sql := "delete from  `tb_oauth_access_tokens`  where  `fr_user_id`=?  "
+	sql := "delete from  `tb_auth_access_tokens`  where  `fr_user_id`=?  "
 	if u.Exec(sql, userId).Error == nil {
 		if u.Exec("update  tb_users  set  status=0 where   id=?", userId).Error == nil {
 			return true

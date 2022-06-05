@@ -17,7 +17,7 @@ func (u *UsersModel) ValidTokenCacheToRedis(userId int64) {
 	}
 	defer tokenCacheRedisFact.ReleaseRedisConn()
 
-	sql := "SELECT   token,expires_at  FROM  `tb_oauth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
+	sql := "SELECT   token,expires_at  FROM  `tb_auth_access_tokens`  WHERE   fr_user_id=?  AND  revoked=0  AND  expires_at>NOW() ORDER  BY  expires_at  DESC , updated_at  DESC  LIMIT ?"
 	maxOnlineUsers := variable.ConfigYml.GetInt("Token.JwtTokenOnlineUsers")
 	rows, err := u.Raw(sql, userId, maxOnlineUsers).Rows()
 	defer func() {
