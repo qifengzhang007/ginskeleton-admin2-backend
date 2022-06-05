@@ -65,13 +65,13 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 }
 
 // 给组织机构（部门、岗位）分配菜单权限
-func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assginRes bool) {
+func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assignRes bool) {
 	// 权限分配模块
 	// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台sql执行时可能会遇见死锁状态发生（insert into 时发生了死锁）
 	// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
 	var failTryTimes = 1
 
-	assginRes = true
+	assignRes = true
 	sql := `INSERT  INTO tb_auth_post_mount_has_menu(fr_auth_orgnization_post_id,fr_auth_system_menu_id)
 			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
 			`
@@ -99,7 +99,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 						var lastID int
 						sql = "SELECT id  FROM tb_auth_post_mount_has_menu_button where  fr_auth_post_mount_has_menu_id=?  AND fr_auth_button_cn_en_id=?"
 						if res = a.Raw(sql, temId, buttonId).First(&lastID); res.Error == nil {
-							assginRes = a.AssginCasbinAuthPolicyToOrg(lastID, nodeType)
+							assignRes = a.AssginCasbinAuthPolicyToOrg(lastID, nodeType)
 						}
 					} else {
 						// insert into 执行时遇见死锁状态，尝试重新执行，最大允许五次尝试，否则就记录错误
@@ -108,7 +108,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 							goto label1
 						}
 						variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
-						assginRes = false
+						assignRes = false
 					}
 				}
 			} else {
@@ -117,9 +117,9 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 		}
 	} else {
 		variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单失败", zap.Error(res.Error))
-		assginRes = false
+		assignRes = false
 	}
-	return assginRes
+	return assignRes
 }
 
 // 从组织机构（部门、岗位）删除权限
