@@ -17,7 +17,7 @@ type MenuCreate struct {
 	Sort         *float64 `form:"sort" json:"sort" binding:"required,min=0"`
 	Name         string   `form:"name" json:"name" binding:"required,min=1"`
 	Path         string   `form:"path" json:"path" `
-	Component    string   `form:"component" json:"component" binding:"min=1"`
+	Component    string   `form:"component" json:"component"`
 	Remark       string   `form:"remark" json:"remark"`
 	ButtonDelete string   `json:"button_delete"`
 	ButtonArray  `json:"button_array"`
