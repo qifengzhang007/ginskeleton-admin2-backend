@@ -28,8 +28,8 @@ type AuthSystemMenuService struct {
 //}
 
 // 待分配系统菜单、mmodel、按钮树形化
-func (a *AuthSystemMenuService) SystemMenuButtonToTree(sqlRes []auth.AuthSystemMenuButton) []MenuListTree {
-	var dest = make([]MenuListTree, 0)
+func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystemMenuButton) []MenuListTree2 {
+	var dest = make([]MenuListTree2, 0)
 	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
 		return dest
 	} else {
@@ -37,6 +37,17 @@ func (a *AuthSystemMenuService) SystemMenuButtonToTree(sqlRes []auth.AuthSystemM
 	}
 	return nil
 }
+
+// 待分配系统菜单、mmodel、按钮树形化
+//func (a *AuthSystemMenuService) SystemMenuButtonToTree(sqlRes []auth.AuthSystemMenuButton) []MenuListTree {
+//	var dest = make([]MenuListTree, 0)
+//	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
+//		return dest
+//	} else {
+//		variable.ZapLog.Error("sql结果数据树形化失败，错误明细：", zap.Error(err))
+//	}
+//	return nil
+//}
 
 // 已分配给系统菜单、按钮树形化
 func (a *AuthSystemMenuService) AssginedMenuButtonToTree(sqlRes []auth.AssignedSystemMenuButton) []AssignedMenuListTree {

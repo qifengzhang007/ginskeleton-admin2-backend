@@ -14,9 +14,9 @@ type SystemMenuAssignController struct {
 // 待分配的系统菜单以及挂接的按钮
 func (a *SystemMenuAssignController) SystemMenuButtonAllList(context *gin.Context) {
 
-	totalCOunts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetSystemMenuButtonList()
-	if totalCOunts > 0 && showList != nil {
-		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCOunts, "data": (&auth_system_menu.AuthSystemMenuService{}).SystemMenuButtonToTree(showList)})
+	totalCounts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetSystemMenuButtonList()
+	if totalCounts > 0 && showList != nil {
+		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCounts, "data": (&auth_system_menu.AuthSystemMenuService{}).SystemMenuButtonToTree2(showList)})
 	} else {
 		response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
 	}

@@ -16,18 +16,27 @@ type AuthMenuAssignModel struct {
 	model.BaseModel
 }
 
-// 待分配的系统菜单、按钮 数据列表
+// GetSystemMenuButtonList 待分配的系统菜单、按钮 数据列表
+// 注意：按钮的id有可能和主菜单id重复，所以按钮id基准值增加 100000 （10万），后续分配权限时减去 10万即可
 func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []AuthSystemMenuButton) {
 	sql := `
-		SELECT a.id  AS  system_menu_id,a.fid  AS  system_menu_fid,a.title,
-		IFNULL( b.fr_auth_system_menu_id,0) AS fr_auth_system_menu_id,
-		(CASE WHEN  IFNULL(b.fr_auth_system_menu_id,0)=0 THEN 'menu' ELSE 'button' END  ) AS node_type,
-		IFNULL( c.id,0) AS button_id,
-		IFNULL(c.cn_name,'') AS button_name,(CASE WHEN a.fid=0 THEN 1 ELSE 0 END)  AS  expand
-		FROM
-		tb_auth_system_menu a LEFT   JOIN tb_auth_system_menu_button  b ON a.id=b.fr_auth_system_menu_id
-		LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
-		ORDER   BY a.sort DESC, a.id ASC, a.fid ASC,c.id ASC
+			SELECT a.id  AS  system_menu_id,a.fid  AS  system_menu_fid,a.title,
+			'menu'  AS node_type,
+			(CASE WHEN a.fid=0 THEN 1 ELSE 0 END)  AS  expand,
+			a.sort
+			FROM
+			tb_auth_system_menu a-- LEFT   JOIN tb_auth_system_menu_button  b ON a.id=b.fr_auth_system_menu_id
+			UNION  
+			SELECT 
+			IFNULL( c.id,0)+100000 AS button_id,
+			IFNULL( b.fr_auth_system_menu_id,0) AS fr_auth_system_menu_id,
+			IFNULL(c.cn_name,'') AS button_name,
+			'button' AS node_type,
+			0  AS  expand,
+			0 AS sort
+			FROM
+			tb_auth_system_menu_button  b   LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
+			ORDER   BY  sort  DESC,system_menu_id ASC,system_menu_fid ASC 
 			`
 	if res := a.Raw(sql).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data

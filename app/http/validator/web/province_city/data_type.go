@@ -10,6 +10,11 @@ type BaseField struct {
 type Id struct {
 	Id float64 `form:"id" json:"id" binding:"required,min=1"` // 注意：gin数字的存储形式以 float64 接受
 }
+
+type Ids struct {
+	Ids string `form:"ids" json:"ids" binding:"required,min=1"` // 注意：gin数字的存储形式以 float64 接受
+}
+
 type Fid struct {
 	Fid *float64 `form:"fid"  json:"fid"  binding:"required,min=0" ` // 注意：gin数字的存储形式以 float64 接受
 }
