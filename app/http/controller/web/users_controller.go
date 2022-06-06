@@ -38,7 +38,6 @@ func (u *Users) Login(context *gin.Context) {
 	pass := context.GetString(consts.ValidatorPrefix + "pass")
 	phone := context.GetString(consts.ValidatorPrefix + "phone")
 	userModel := users.CreateUserFactory("").Login(userName, pass)
-	fmt.Println("收到的参数：", userName, pass)
 	if userModel != nil {
 		userTokenFactory := userstoken.CreateUserFactory()
 		if userToken, err := userTokenFactory.GenerateToken(userModel.Id, userModel.UserName, userModel.Phone, variable.ConfigYml.GetInt64("Token.JwtTokenCreatedExpireAt")); err == nil {
