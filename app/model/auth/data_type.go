@@ -14,6 +14,19 @@ type AuthSystemMenuButton struct {
 	Expand             int8
 }
 
+// AssignedSystemMenuButton2 已分配系统给部门、岗位的的菜单、按钮返回结构体
+type AssignedSystemMenuButton2 struct {
+	SystemMenuId           int
+	SystemMenuFid          int
+	Title                  string
+	NodeType               string
+	Expand                 int8
+	OrgPostId              int
+	AuthPostMountHasMenuId int
+	sort1                  int
+	sort2                  int
+}
+
 // 已分配系统给部门、岗位的的菜单、按钮返回结构体
 type AssignedSystemMenuButton struct {
 	OrgPostId                int

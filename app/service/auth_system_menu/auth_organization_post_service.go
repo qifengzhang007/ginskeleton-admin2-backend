@@ -14,19 +14,6 @@ import (
 type AuthSystemMenuService struct {
 }
 
-//
-//func (a *AuthSystemMenuService) GetOrgByFid(fid int) (err error, data []auth.AuthSystemMenuTree) {
-//	//models := auth.CreateAuthSystemMenuFactory("")
-//	//err = models.GetByFid(fid, &data)
-//	//for key, value := range data {
-//	//	if value.HasSubNode > 0 {
-//	//		value.Children = []auth.AuthSystemMenuTree{}
-//	//		data[key] = value
-//	//	}
-//	//}
-//	return
-//}
-
 // 待分配系统菜单、mmodel、按钮树形化
 func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystemMenuButton) []MenuListTree2 {
 	var dest = make([]MenuListTree2, 0)
@@ -38,20 +25,9 @@ func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystem
 	return nil
 }
 
-// 待分配系统菜单、mmodel、按钮树形化
-//func (a *AuthSystemMenuService) SystemMenuButtonToTree(sqlRes []auth.AuthSystemMenuButton) []MenuListTree {
-//	var dest = make([]MenuListTree, 0)
-//	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
-//		return dest
-//	} else {
-//		variable.ZapLog.Error("sql结果数据树形化失败，错误明细：", zap.Error(err))
-//	}
-//	return nil
-//}
-
 // 已分配给系统菜单、按钮树形化
-func (a *AuthSystemMenuService) AssginedMenuButtonToTree(sqlRes []auth.AssignedSystemMenuButton) []AssignedMenuListTree {
-	var dest = make([]AssignedMenuListTree, 0)
+func (a *AuthSystemMenuService) AssginedMenuButtonToTree2(sqlRes []auth.AssignedSystemMenuButton2) []AssignedSystemMenuButton2 {
+	var dest = make([]AssignedSystemMenuButton2, 0)
 	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
 		return dest
 	} else {
