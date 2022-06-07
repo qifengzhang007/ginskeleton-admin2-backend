@@ -95,60 +95,64 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 	assignRes = true
 	sql := `INSERT  INTO tb_auth_post_mount_has_menu(fr_auth_orgnization_post_id,fr_auth_system_menu_id)
 			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
+	
 			`
-	//1.如果fid>0 增加一条父级菜单分配记录
-	if systemMenuFid > 0 {
-		if res := a.Exec(sql, orgId, systemMenuFid, orgId, systemMenuFid); res.Error != nil {
-			variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
-			return false
-		} else {
-			// 继续判断是否还有上一级菜单，这样就能够支持到三级菜单
+	//1.菜单分配权限
+	if systemMenuFid >= 0 {
+		if nodeType == "menu" {
+			if res := a.Exec(sql, orgId, systemMenuId, orgId, systemMenuId); res.Error != nil {
+				variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
+				return false
+			}
+		}
+		// 继续判断是否还有上一级菜单，这样就能够支持到三级菜单
+		var tmpSystemMenuFid = int64(systemMenuFid)
+		var tmpFid int64 = 0
+		for i := 0; i < 2; i++ {
 			tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
-			var tmpFid int64 = 0
-			if _ = a.Raw(tmpSql, systemMenuFid).First(&tmpFid); tmpFid > 0 {
-				if res = a.Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
+			if _ = a.Raw(tmpSql, tmpSystemMenuFid).First(&tmpFid); tmpFid > 0 {
+				tmpSystemMenuFid = tmpFid
+				if res := a.Debug().Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
 					variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
 					return false
 				}
+			} else {
+				break
 			}
 		}
 	}
-	//2.当前菜单增加一条分配记录
-	if res := a.Exec(sql, orgId, systemMenuId, orgId, systemMenuId); res.Error == nil {
-		if nodeType == "button" {
-			sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
-			var temId int
-			if res = a.Raw(sql, orgId, systemMenuId).First(&temId); res.Error == nil && temId > 0 {
-				sql = `
+
+	//2.按钮权限分配
+	if nodeType == "button" {
+		sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
+		var temId int
+		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil && temId > 0 {
+			sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
 					`
-				if buttonId > 0 {
-				label1:
-					if res = a.Exec(sql, temId, buttonId, temId, buttonId); res.Error == nil {
-						// 继续分配接口的访问权限(casbin_rules写入相关数据)
-						var lastID int
-						sql = "SELECT id  FROM tb_auth_post_mount_has_menu_button where  fr_auth_post_mount_has_menu_id=?  AND fr_auth_button_cn_en_id=?"
-						if res = a.Raw(sql, temId, buttonId).First(&lastID); res.Error == nil {
-							assignRes = a.AssginCasbinAuthPolicyToOrg(lastID, nodeType)
-						}
-					} else {
-						// insert into 执行时遇见死锁状态，尝试重新执行，最大允许五次尝试，否则就记录错误
-						if failTryTimes <= 5 {
-							failTryTimes++
-							goto label1
-						}
-						variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
-						assignRes = false
+			if buttonId > 0 {
+			label1:
+				if res = a.Exec(sql, temId, buttonId, temId, buttonId); res.Error == nil {
+					// 3.继续分配接口的访问权限(casbin_rules写入相关数据)
+					var lastID int
+					sql = "SELECT id  FROM tb_auth_post_mount_has_menu_button where  fr_auth_post_mount_has_menu_id=?  AND fr_auth_button_cn_en_id=?"
+					if res = a.Raw(sql, temId, buttonId).First(&lastID); res.Error == nil {
+						assignRes = a.AssginCasbinAuthPolicyToOrg(lastID, nodeType)
 					}
+				} else {
+					// insert into 执行时遇见死锁状态，尝试重新执行，最大允许五次尝试，否则就记录错误
+					if failTryTimes <= 5 {
+						failTryTimes++
+						goto label1
+					}
+					variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
+					assignRes = false
 				}
-			} else {
-				variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
 			}
+		} else {
+			variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
 		}
-	} else {
-		variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单失败", zap.Error(res.Error))
-		assignRes = false
 	}
 	return assignRes
 }

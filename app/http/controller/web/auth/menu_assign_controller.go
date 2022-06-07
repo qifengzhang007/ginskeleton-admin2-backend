@@ -43,8 +43,7 @@ func (a *SystemMenuAssignController) AssignAuthToOrg(context *gin.Context) {
 	buttonId := context.GetFloat64(consts.ValidatorPrefix + "button_id")
 	nodeType := context.GetString(consts.ValidatorPrefix + "node_type")
 	fmt.Println(int(orgPostId), int(systemMenuId), int(systemMenuFid), int(buttonId), nodeType)
-	response.Success(context, consts.AuthAssginOkMsg, "")
-	return
+
 	menuAssignFac := modeAuth.CreateAuthMenuAssignFactory("")
 	res := menuAssignFac.AssginAuthForOrg(int(orgPostId), int(systemMenuId), int(systemMenuFid), int(buttonId), nodeType)
 	if res {
