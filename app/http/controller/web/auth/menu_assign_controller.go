@@ -27,9 +27,9 @@ func (a *SystemMenuAssignController) SystemMenuButtonAllList(context *gin.Contex
 func (a *SystemMenuAssignController) AssignedToOrgPostMenuButton(context *gin.Context) {
 	orgPostId := context.GetFloat64(consts.ValidatorPrefix + "org_post_id")
 
-	totalCounts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetAssignedMenuButtonList(int(orgPostId))
+	totalCounts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetAssignedMenuButtonList2(int(orgPostId))
 	if totalCounts > 0 && showList != nil {
-		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCounts, "data": (&auth_system_menu.AuthSystemMenuService{}).AssginedMenuButtonToTree(showList)})
+		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCounts, "data": (&auth_system_menu.AuthSystemMenuService{}).AssginedMenuButtonToTree2(showList)})
 	} else {
 		response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
 	}

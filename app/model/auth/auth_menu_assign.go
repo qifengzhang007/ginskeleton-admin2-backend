@@ -48,26 +48,37 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 }
 
 // 已分配给部门、岗位的系统菜单、按钮
-func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts int64, data []AssignedSystemMenuButton) {
+func (a *AuthMenuAssignModel) GetAssignedMenuButtonList2(orgPostId int) (counts int64, data []AssignedSystemMenuButton2) {
 	sql := `
-		SELECT  
-		a.fr_auth_orgnization_post_id  AS org_post_id,
-		b.id AS  system_menu_id,b.fid AS system_menu_fid, b.title,
-		a.id AS post_mount_has_menu_id  ,
-		IFNULL(c.fr_auth_post_mount_has_menu_id,0) AS fr_mount_has_menu_id  , 
-		IFNULL(c.id,0) AS  post_mount_has_menu_button_id,
-		(CASE WHEN c.id>0 THEN 'button' ELSE 'menu' END) AS node_type,
-		IFNULL(d.cn_name,'')  AS  button_name,
-		0 as checked,1 as expand
-		FROM 
-		tb_auth_post_mount_has_menu  a  LEFT JOIN tb_auth_system_menu  b  ON  a.fr_auth_system_menu_id=b.id
-		LEFT JOIN tb_auth_post_mount_has_menu_button  c  ON  a.id=c.fr_auth_post_mount_has_menu_id
-		LEFT  JOIN tb_auth_button_cn_en  d  ON  c.fr_auth_button_cn_en_id=d.id
-		WHERE  a.status=1
-		AND  a.fr_auth_orgnization_post_id=?
-		ORDER BY  b.sort DESC, b.id ASC, b.fid ASC,d.id ASC
+			SELECT  
+			b.id AS  system_menu_id,b.fid AS system_menu_fid, b.title,
+			'menu' AS node_type,
+			(case  when b.fid=0 then 1 else 0  end) AS expand,
+			a.fr_auth_orgnization_post_id  AS org_post_id,a.id  AS  auth_post_mount_has_menu_id, b.sort  AS  sort1,0 AS  sort2 
+			FROM 
+			tb_auth_post_mount_has_menu  a , tb_auth_system_menu  b  
+			WHERE  a.fr_auth_system_menu_id=b.id
+			AND  a.status=1
+			AND  a.fr_auth_orgnization_post_id=?
+			UNION
+			SELECT  
+			IFNULL(c.id,0)   AS  post_mount_has_menu_button_id,
+			a.fr_auth_system_menu_id,
+			IFNULL(d.cn_name,'')  AS  button_name,
+			'button' AS node_type,
+			0 AS expand, a.fr_auth_orgnization_post_id  AS org_post_id,
+			a.id  AS  auth_post_mount_has_menu_id  ,0 AS  sort1,  d.id  AS sort2
+			FROM 
+			tb_auth_post_mount_has_menu  a ,tb_auth_post_mount_has_menu_button  c  ,tb_auth_button_cn_en  d  
+			WHERE
+			a.id=c.fr_auth_post_mount_has_menu_id
+			AND
+			c.fr_auth_button_cn_en_id=d.id
+			AND   a.status=1
+			AND a.fr_auth_orgnization_post_id=?
+			ORDER   BY   sort1  DESC, sort2 ASC, system_menu_id  ASC ,system_menu_fid  ASC
 			`
-	if res := a.Raw(sql, orgPostId).Find(&data); res.Error == nil && res.RowsAffected > 0 {
+	if res := a.Raw(sql, orgPostId, orgPostId).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data
 	}
 	return 0, nil
@@ -90,6 +101,16 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 		if res := a.Exec(sql, orgId, systemMenuFid, orgId, systemMenuFid); res.Error != nil {
 			variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
 			return false
+		} else {
+			// 继续判断是否还有上一级菜单，这样就能够支持到三级菜单
+			tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
+			var tmpFid int64 = 0
+			if _ = a.Raw(tmpSql, systemMenuFid).First(&tmpFid); tmpFid > 0 {
+				if res = a.Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
+					variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
+					return false
+				}
+			}
 		}
 	}
 	//2.当前菜单增加一条分配记录
