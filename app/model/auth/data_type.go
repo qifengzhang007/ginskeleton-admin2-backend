@@ -133,7 +133,6 @@ type AuthSystemMenuTree struct {
 }
 
 // 系统菜单挂接的按钮列表
-
 type SystemMenuButtonList struct {
 	Id                 int    `json:"id"`
 	FrAuthSystemMenuId int    `json:"fr_auth_system_menu_id"`
@@ -144,3 +143,6 @@ type SystemMenuButtonList struct {
 	Status             int    `json:"status"`
 	Remark             string `json:"remark"`
 }
+
+// 多层级树形列表，自己可能需要使用的临时常量
+const TmpVal = 100000

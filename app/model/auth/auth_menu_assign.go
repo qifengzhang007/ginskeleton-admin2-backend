@@ -28,7 +28,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 			tb_auth_system_menu a-- LEFT   JOIN tb_auth_system_menu_button  b ON a.id=b.fr_auth_system_menu_id
 			UNION  
 			SELECT 
-			IFNULL( c.id,0)+100000 AS button_id,
+			IFNULL( c.id,0)+? AS button_id,
 			IFNULL( b.fr_auth_system_menu_id,0) AS fr_auth_system_menu_id,
 			IFNULL(c.cn_name,'') AS button_name,
 			'button' AS node_type,
@@ -38,7 +38,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 			tb_auth_system_menu_button  b   LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
 			ORDER   BY  sort  DESC,system_menu_id ASC,system_menu_fid ASC 
 			`
-	if res := a.Raw(sql).Find(&data); res.Error == nil && res.RowsAffected > 0 {
+	if res := a.Raw(sql, TmpVal).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data
 	} else {
 		variable.ZapLog.Error("查询系统待分配菜单出错：", zap.Error(res.Error))
@@ -75,6 +75,7 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 
 // 给组织机构（部门、岗位）分配菜单权限
 func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assignRes bool) {
+	buttonId = buttonId - TmpVal // 还原为真实 button_id
 	// 权限分配模块
 	// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台sql执行时可能会遇见死锁状态发生（insert into 时发生了死锁）
 	// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
