@@ -48,7 +48,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 }
 
 // 已分配给部门、岗位的系统菜单、按钮
-func (a *AuthMenuAssignModel) GetAssignedMenuButtonList2(orgPostId int) (counts int64, data []AssignedSystemMenuButton2) {
+func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts int64, data []AssignedSystemMenuButton) {
 	sql := `
 			SELECT  
 			b.id AS  system_menu_id,b.fid AS system_menu_fid, b.title,
@@ -86,7 +86,7 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList2(orgPostId int) (counts 
 
 // 给组织机构（部门、岗位）分配菜单权限
 func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assignRes bool) {
-	buttonId = buttonId - TmpVal // 还原为真实 button_id
+	buttonId = buttonId - TmpVal //  button_id 还原为真实id
 	// 权限分配模块
 	// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台sql执行时可能会遇见死锁状态发生（insert into 时发生了死锁）
 	// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
@@ -94,8 +94,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 
 	assignRes = true
 	sql := `INSERT  INTO tb_auth_post_mount_has_menu(fr_auth_orgnization_post_id,fr_auth_system_menu_id)
-			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
-	
+			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  force  index(idx_post_menu) WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
 			`
 	//1.菜单分配权限
 	if systemMenuFid >= 0 {
@@ -112,7 +111,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 			tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
 			if _ = a.Raw(tmpSql, tmpSystemMenuFid).First(&tmpFid); tmpFid > 0 {
 				tmpSystemMenuFid = tmpFid
-				if res := a.Debug().Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
+				if res := a.Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
 					variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
 					return false
 				}
@@ -129,7 +128,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil && temId > 0 {
 			sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
-					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
+					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  force index(idx_menu_button)  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
 					`
 			if buttonId > 0 {
 			label1:
@@ -215,7 +214,7 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
-			WHERE NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a WHERE  a.ptype=? AND  a.v0=? AND  a.v1=? AND  a.v2=? FOR UPDATE)
+			WHERE NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a  force  index(index_vp01) WHERE  a.ptype=? AND  a.v0=? AND  a.v1=? AND  a.v2=? FOR UPDATE)
 			`
 		label1:
 			if res = a.Exec(sql, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod, tmp.AuthPostMountHasMenuButtonId, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod); res.Error == nil {

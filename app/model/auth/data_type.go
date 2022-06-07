@@ -14,8 +14,8 @@ type AuthSystemMenuButton struct {
 	Expand             int8
 }
 
-// AssignedSystemMenuButton2 已分配系统给部门、岗位的的菜单、按钮返回结构体
-type AssignedSystemMenuButton2 struct {
+// AssignedSystemMenuButton 已分配系统给部门、岗位的的菜单、按钮返回结构体
+type AssignedSystemMenuButton struct {
 	SystemMenuId           int
 	SystemMenuFid          int
 	Title                  string
@@ -25,22 +25,6 @@ type AssignedSystemMenuButton2 struct {
 	AuthPostMountHasMenuId int
 	sort1                  int
 	sort2                  int
-}
-
-// 已分配系统给部门、岗位的的菜单、按钮返回结构体
-type AssignedSystemMenuButton struct {
-	OrgPostId                int
-	SystemMenuId             int8
-	SystemMenuFid            int8
-	PostMountHasMenuId       int
-	FrMountHasMenuId         int
-	PostMountHasMenuButtonId int
-	Title                    string
-	NodeType                 string
-	ButtonId                 int
-	ButtonName               string
-	Checked                  int8
-	Expand                   int8
 }
 
 // 根据用户id查询已经分配的权限树形结构
@@ -157,5 +141,5 @@ type SystemMenuButtonList struct {
 	Remark             string `json:"remark"`
 }
 
-// 多层级树形列表，自己可能需要使用的临时常量
+// 多层级树形列表，子级可能需要使用的临时常量
 const TmpVal = 100000

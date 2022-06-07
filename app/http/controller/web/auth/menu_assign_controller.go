@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
 	modeAuth "goskeleton/app/model/auth"
@@ -27,9 +26,9 @@ func (a *SystemMenuAssignController) SystemMenuButtonAllList(context *gin.Contex
 func (a *SystemMenuAssignController) AssignedToOrgPostMenuButton(context *gin.Context) {
 	orgPostId := context.GetFloat64(consts.ValidatorPrefix + "org_post_id")
 
-	totalCounts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetAssignedMenuButtonList2(int(orgPostId))
+	totalCounts, showList := modeAuth.CreateAuthMenuAssignFactory("").GetAssignedMenuButtonList(int(orgPostId))
 	if totalCounts > 0 && showList != nil {
-		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCounts, "data": (&auth_system_menu.AuthSystemMenuService{}).AssginedMenuButtonToTree2(showList)})
+		response.Success(context, consts.CurdStatusOkMsg, gin.H{"counts": totalCounts, "data": (&auth_system_menu.AuthSystemMenuService{}).AssginedMenuButtonToTree(showList)})
 	} else {
 		response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
 	}
@@ -42,7 +41,6 @@ func (a *SystemMenuAssignController) AssignAuthToOrg(context *gin.Context) {
 	systemMenuFid := context.GetFloat64(consts.ValidatorPrefix + "system_menu_fid")
 	buttonId := context.GetFloat64(consts.ValidatorPrefix + "button_id")
 	nodeType := context.GetString(consts.ValidatorPrefix + "node_type")
-	fmt.Println(int(orgPostId), int(systemMenuId), int(systemMenuFid), int(buttonId), nodeType)
 
 	menuAssignFac := modeAuth.CreateAuthMenuAssignFactory("")
 	res := menuAssignFac.AssginAuthForOrg(int(orgPostId), int(systemMenuId), int(systemMenuFid), int(buttonId), nodeType)

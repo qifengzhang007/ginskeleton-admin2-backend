@@ -26,8 +26,8 @@ func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystem
 }
 
 // 已分配给系统菜单、按钮树形化
-func (a *AuthSystemMenuService) AssginedMenuButtonToTree2(sqlRes []auth.AssignedSystemMenuButton2) []AssignedSystemMenuButton2 {
-	var dest = make([]AssignedSystemMenuButton2, 0)
+func (a *AuthSystemMenuService) AssginedMenuButtonToTree(sqlRes []auth.AssignedSystemMenuButton) []AssignedSystemMenuButton {
+	var dest = make([]AssignedSystemMenuButton, 0)
 	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
 		return dest
 	} else {
