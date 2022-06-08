@@ -214,7 +214,7 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
-			WHERE NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a  force  index(index_vp01) WHERE  a.ptype=? AND  a.v0=? AND  a.v1=? AND  a.v2=? FOR UPDATE)
+			WHERE NOT  EXISTS(SELECT 1 FROM tb_auth_casbin_rule a  force  index(idx_vp01) WHERE  a.ptype=? AND  a.v0=? AND  a.v1=? AND  a.v2=? FOR UPDATE)
 			`
 		label1:
 			if res = a.Exec(sql, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod, tmp.AuthPostMountHasMenuButtonId, tmp.Ptype, tmp.FrAuthOrgnizationPostId, tmp.RequestUrl, tmp.RequestMethod); res.Error == nil {
