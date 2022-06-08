@@ -123,9 +123,15 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 
 	//2.按钮权限分配
 	if nodeType == "button" {
+	label0:
 		sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 		var temId int
-		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil && temId > 0 {
+		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil {
+			if temId == 0 {
+				failTryTimes++
+				goto label0
+			}
+			failTryTimes = 1
 			sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  force index(idx_menu_button)  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
@@ -150,7 +156,8 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 				}
 			}
 		} else {
-			variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮失败", zap.Error(res.Error))
+			assignRes = false
+			variable.ZapLog.Error("tb_auth_post_mount_has_menu_button  表分配按钮参数查询失出错：", zap.Error(res.Error))
 		}
 	}
 	return assignRes
