@@ -80,6 +80,12 @@ func (a *AuthSystemMenuModel) GetByFid(fid int) (data []AuthSystemMenuTree, err 
 	return
 }
 
+// 获取菜单fid的节点深度
+func (a *AuthSystemMenuModel) GetMenuLevel(fid int) (nodeLevel int64) {
+	_ = a.Model(a).Select("node_level").Where("id=?", fid).First(&nodeLevel)
+	return
+}
+
 //新增
 func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuModel) {
 	var tmp AuthSystemMenuModel

@@ -47,7 +47,14 @@ func (a *SystemMenuController) GetMountButtonList(c *gin.Context) {
 
 // 1.新增
 func (a *SystemMenuController) Create(c *gin.Context) {
-	isOk, data := modeAuth.CreateAuthSystemMenuFactory("").InsertData(c)
+	// 限制菜单最大深度为3级，超过此值不允许添加
+	fid := c.GetFloat64(consts.ValidatorPrefix + "fid")
+	sysMenuFac := modeAuth.CreateAuthSystemMenuFactory("")
+	if sysMenuFac.GetMenuLevel(int(fid)) >= 3 {
+		response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg+",节点最大深度为3级", struct{}{})
+		return
+	}
+	isOk, data := sysMenuFac.InsertData(c)
 	if isOk {
 		if (&auth_system_menu.AuthSystemMenuService{}).InsertButton(c, data.Id) {
 			response.Success(c, consts.CurdStatusOkMsg, consts.CurdStatusOkCode)
