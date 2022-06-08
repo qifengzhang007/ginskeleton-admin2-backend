@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
+	"goskeleton/app/http/validator/web/auth/system_menu/data_type"
 	modeAuth "goskeleton/app/model/auth"
 	"goskeleton/app/service/auth_system_menu"
 	"goskeleton/app/utils/response"
@@ -36,19 +37,28 @@ func (a *SystemMenuAssignController) AssignedToOrgPostMenuButton(context *gin.Co
 
 // 为组织机构（部门、岗位）分配权限
 func (a *SystemMenuAssignController) AssignAuthToOrg(context *gin.Context) {
-	orgPostId := context.GetFloat64(consts.ValidatorPrefix + "org_post_id")
-	systemMenuId := context.GetFloat64(consts.ValidatorPrefix + "system_menu_id")
-	systemMenuFid := context.GetFloat64(consts.ValidatorPrefix + "system_menu_fid")
-	buttonId := context.GetFloat64(consts.ValidatorPrefix + "button_id")
-	nodeType := context.GetString(consts.ValidatorPrefix + "node_type")
-
 	menuAssignFac := modeAuth.CreateAuthMenuAssignFactory("")
-	res := menuAssignFac.AssginAuthForOrg(int(orgPostId), int(systemMenuId), int(systemMenuFid), int(buttonId), nodeType)
-	if res {
-		response.Success(context, consts.AuthAssginOkMsg, "")
-		return
+
+	if menuList, ok := context.MustGet("auth_assign_menu_list").(data_type.MenuButtonList); ok {
+		for _, item := range menuList {
+			res := menuAssignFac.AssginAuthForOrg(int(item.OrgPostId), int(item.SystemMenuButtonId), int(item.SystemMenuFid), item.NodeType)
+			if !res {
+				response.Fail(context, consts.AuthAssginFailCode, consts.AuthAssginFailMsg, "")
+				return
+			}
+		}
 	}
-	response.Fail(context, consts.AuthAssginFailCode, consts.AuthAssginFailMsg, "")
+
+	if buttonList, ok := context.MustGet("auth_assign_button_list").(data_type.MenuButtonList); ok {
+		for _, item := range buttonList {
+			res := menuAssignFac.AssginAuthForOrg(int(item.OrgPostId), int(item.SystemMenuButtonId), int(item.SystemMenuFid), item.NodeType)
+			if !res {
+				response.Fail(context, consts.AuthAssginFailCode, consts.AuthAssginFailMsg, "")
+				return
+			}
+		}
+	}
+	response.Success(context, consts.AuthAssginOkMsg, "")
 }
 
 // 删除已经分配给组织机构（部门、岗位）的权限

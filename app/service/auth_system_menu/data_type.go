@@ -1,21 +1,21 @@
 package auth_system_menu
 
 // MenuListTree2 待分配的所有菜单，树形列表
-type MenuListTree2 struct {
-	SystemMenuId  int             `primaryKey:"yes" json:"system_menu_id"`
-	SystemMenuFid int             `fid:"SystemMenuId"  json:"system_menu_fid"`
-	Title         string          `json:"title"`
-	NodeType      string          `json:"node_type" default:"menu"`
-	Expand        int8            `json:"expand"`
-	Sort          int             `json:"sort"`
-	Children      []MenuListTree2 `json:"children"`
+type MenuListTree struct {
+	SystemMenuButtonId int            `primaryKey:"yes" json:"system_menu_button_id"`
+	SystemMenuFid      int            `fid:"SystemMenuButtonId"  json:"system_menu_fid"`
+	Title              string         `json:"title"`
+	NodeType           string         `json:"node_type" default:"menu"`
+	Expand             int8           `json:"expand"`
+	Sort               int            `json:"sort"`
+	Children           []MenuListTree `json:"children"`
 }
 
 // AssignedSystemMenuButton 已分配给部门、岗位的系统菜单、按钮结构体
 // 已分配系统给部门、岗位的的菜单、按钮返回结构体
 type AssignedSystemMenuButton struct {
-	SystemMenuId           int                        `primaryKey:"yes" json:"system_menu_id"`
-	SystemMenuFid          int                        `fid:"SystemMenuId" json:"system_menu_fid"`
+	SystemMenuButtonId     int                        `primaryKey:"yes" json:"system_menu_button_id"`
+	SystemMenuFid          int                        `fid:"SystemMenuButtonId" json:"system_menu_fid"`
 	Title                  string                     `json:"title"`
 	NodeType               string                     `json:"node_type"`
 	Expand                 int8                       `json:"expand"`

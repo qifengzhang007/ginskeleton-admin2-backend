@@ -15,8 +15,8 @@ type AuthSystemMenuService struct {
 }
 
 // 待分配系统菜单、mmodel、按钮树形化
-func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystemMenuButton) []MenuListTree2 {
-	var dest = make([]MenuListTree2, 0)
+func (a *AuthSystemMenuService) SystemMenuButtonToTree2(sqlRes []auth.AuthSystemMenuButton) []MenuListTree {
+	var dest = make([]MenuListTree, 0)
 	if err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(sqlRes, &dest); err == nil {
 		return dest
 	} else {

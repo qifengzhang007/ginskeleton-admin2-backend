@@ -41,3 +41,11 @@ type MenuEdit struct {
 	Id int64 `json:"id"`
 	MenuCreate
 }
+
+// 权限分配请求参数
+type MenuButtonList []struct {
+	NodeType           string `json:"node_type" binding:"required"`
+	OrgPostId          int64  `json:"org_post_id" binding:"required"`
+	SystemMenuButtonId int64  `json:"system_menu_button_id" binding:"required"`
+	SystemMenuFid      int64  `json:"system_menu_fid" binding:"required"`
+}

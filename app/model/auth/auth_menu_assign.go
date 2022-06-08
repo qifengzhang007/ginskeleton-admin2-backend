@@ -20,7 +20,7 @@ type AuthMenuAssignModel struct {
 // 注意：按钮的id有可能和主菜单id重复，所以按钮id基准值增加 100000 （10万），后续分配权限时减去 10万即可
 func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []AuthSystemMenuButton) {
 	sql := `
-			SELECT a.id  AS  system_menu_id,a.fid  AS  system_menu_fid,a.title,
+			SELECT a.id  AS  system_menu_button_id,a.fid  AS  system_menu_fid,a.title,
 			'menu'  AS node_type,
 			(CASE WHEN a.fid=0 THEN 1 ELSE 0 END)  AS  expand,
 			a.sort
@@ -36,7 +36,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 			0 AS sort
 			FROM
 			tb_auth_system_menu_button  b   LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
-			ORDER   BY  sort  DESC,system_menu_id ASC,system_menu_fid ASC 
+			ORDER   BY  sort  DESC,system_menu_button_id ASC,system_menu_fid ASC 
 			`
 	if res := a.Raw(sql, TmpVal).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data
@@ -51,7 +51,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts int64, data []AssignedSystemMenuButton) {
 	sql := `
 			SELECT  
-			b.id AS  system_menu_id,b.fid AS system_menu_fid, b.title,
+			b.id AS  system_menu_button_id,b.fid AS system_menu_fid, b.title,
 			'menu' AS node_type,
 			(case  when b.fid=0 then 1 else 0  end) AS expand,
 			a.fr_auth_orgnization_post_id  AS org_post_id,a.id  AS  auth_post_mount_has_menu_id, b.sort  AS  sort1,0 AS  sort2 
@@ -76,7 +76,7 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 			c.fr_auth_button_cn_en_id=d.id
 			AND   a.status=1
 			AND a.fr_auth_orgnization_post_id=?
-			ORDER   BY   sort1  DESC, sort2 ASC, system_menu_id  ASC ,system_menu_fid  ASC
+			ORDER   BY   sort1  DESC, sort2 ASC, system_menu_button_id  ASC ,system_menu_fid  ASC
 			`
 	if res := a.Raw(sql, orgPostId, orgPostId).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data
@@ -85,8 +85,8 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 }
 
 // 给组织机构（部门、岗位）分配菜单权限
-func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFid, buttonId int, nodeType string) (assignRes bool) {
-	buttonId = buttonId - TmpVal //  button_id 还原为真实id
+func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuButtonId, systemMenuFid int, nodeType string) (assignRes bool) {
+
 	// 权限分配模块
 	// 如果在前端界面一次性批量勾线上百条节点同时分配，前端会并发提交，后台sql执行时可能会遇见死锁状态发生（insert into 时发生了死锁）
 	// 这里出现死锁时，需要尝试重新执行sql 《高性能mysql》这个本书上有介绍，死锁在并发高的场景下很难避免，尝试重新执行sql是一种解决方案，其他解决方式请自行百度了解
@@ -97,41 +97,29 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 			SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu a  force  index(idx_post_menu) WHERE  a.fr_auth_orgnization_post_id=? AND a.fr_auth_system_menu_id=? FOR UPDATE)
 			`
 	//1.菜单分配权限
-	if systemMenuFid >= 0 {
-		if nodeType == "menu" {
-			if res := a.Exec(sql, orgId, systemMenuId, orgId, systemMenuId); res.Error != nil {
-				variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
-				return false
-			}
-		}
-		// 继续判断是否还有上一级菜单，这样就能够支持到三级菜单
-		var tmpSystemMenuFid = int64(systemMenuFid)
-		var tmpFid int64 = 0
-		for i := 0; i < 2; i++ {
-			tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
-			if _ = a.Raw(tmpSql, tmpSystemMenuFid).First(&tmpFid); tmpFid > 0 {
-				tmpSystemMenuFid = tmpFid
-				if res := a.Exec(sql, orgId, tmpFid, orgId, tmpFid); res.Error != nil {
-					variable.ZapLog.Error("tb_auth_post_mount_has_menu  表分配菜单父级失败", zap.Error(res.Error))
-					return false
+	if nodeType == "menu" {
+		// 每一个菜单都可能有上级菜单，最大支持到三级菜单即可
+		var tmpSystemMenuId = systemMenuButtonId
+		var tmpFid = 0
+		for i := 0; i < 3; i++ {
+			if res := a.Exec(sql, orgId, systemMenuButtonId, orgId, systemMenuButtonId); res.Error == nil {
+				tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
+				if _ = a.Raw(tmpSql, tmpSystemMenuId).First(&tmpFid); tmpFid > 0 {
+					tmpSystemMenuId = tmpFid
 				}
 			} else {
-				break
+				assignRes = false
+				variable.ZapLog.Error("tb_auth_post_mount_has_menu  插入 menuList 时出错", zap.Error(res.Error))
 			}
 		}
 	}
 
 	//2.按钮权限分配
 	if nodeType == "button" {
-	label0:
+		var buttonId = systemMenuButtonId - TmpVal //  button_id 还原为真实id
 		sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 		var temId int
 		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil {
-			if temId == 0 && failTryTimes <= 5 {
-				failTryTimes++
-				goto label0
-			}
-			failTryTimes = 1
 			sql = `
 					INSERT  INTO tb_auth_post_mount_has_menu_button(fr_auth_post_mount_has_menu_id,fr_auth_button_cn_en_id)
 					SELECT ?,? FROM  DUAL  WHERE   NOT EXISTS(SELECT 1 FROM tb_auth_post_mount_has_menu_button a  force index(idx_menu_button)  WHERE  a.fr_auth_post_mount_has_menu_id=? AND a.fr_auth_button_cn_en_id=? FOR UPDATE)
