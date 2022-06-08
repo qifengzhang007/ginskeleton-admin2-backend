@@ -127,7 +127,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuId, systemMenuFi
 		sql = "select id from tb_auth_post_mount_has_menu where fr_auth_orgnization_post_id=? AND fr_auth_system_menu_id=? AND   status=1 "
 		var temId int
 		if res := a.Raw(sql, orgId, systemMenuFid).First(&temId); res.Error == nil {
-			if temId == 0 {
+			if temId == 0 && failTryTimes <= 5 {
 				failTryTimes++
 				goto label0
 			}
