@@ -217,7 +217,7 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 			RequestMethod                string
 			AuthPostMountHasMenuButtonId int
 		}
-		if res := a.Raw(sql, authPostMountHasMenuButtonId).First(&tmp); res.Error == nil {
+		if res := a.Raw(sql, authPostMountHasMenuButtonId).First(&tmp); res.Error == nil && tmp.Ptype != "" {
 			sql = `
 			INSERT  INTO tb_auth_casbin_rule(ptype,v0,v1,v2,fr_auth_post_mount_has_menu_button_id,v3,v4,v5)
 			SELECT  ?,?,?,?,?,'','',''  FROM   DUAL 
@@ -235,6 +235,9 @@ func (a *AuthMenuAssignModel) AssginCasbinAuthPolicyToOrg(authPostMountHasMenuBu
 				resBool = false
 				variable.ZapLog.Error("AuthMenuAssignModel 发生错误", zap.Error(res.Error))
 			}
+		} else {
+			resBool = false
+			variable.ZapLog.Error("根据参数：authPostMountHasMenuButtonId 查询时出错：", zap.Int("authPostMountHasMenuButtonId", authPostMountHasMenuButtonId), zap.Error(res.Error))
 		}
 	}
 	return resBool
