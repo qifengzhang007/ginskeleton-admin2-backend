@@ -163,7 +163,7 @@ func (a *AuthSystemMenuModel) DeleteData(id int) bool {
 //根据IDS获取菜单信息
 func (a *AuthSystemMenuModel) GetByIds(ids []int) (AuthSystemMenuTree []AuthSystemMenuTree) {
 	sql := `
-			SELECT a.id ,a.fid, a.title, a.name, a.icon, a.name as  path, a.node_level,a.component ,
+			SELECT a.id ,a.fid, a.title, a.name, TRIM(a.icon) as icon, a.name as  path, a.node_level,a.component ,
 			IFNULL((SELECT 1 FROM tb_auth_system_menu b WHERE  b.fid=a.id  LIMIT 1),0) as has_sub_node
 			FROM tb_auth_system_menu a  WHERE id IN (?) AND a.status=1 
 			ORDER BY a.sort desc
