@@ -13,7 +13,9 @@ import (
 )
 
 //  gorm v2  操作数据库单元测试
-// 测试本篇首先保证 config/gorm_v2.yml 文件配置正确，相关配置项 IsInitGolobalGormMysql = 1
+//  单元测试为了不影响自带的数据库，我们将单元测试涉及到的表创建在了 独立的额数据库：  db_ginskeleton2_test
+// 测试本篇首先保证 config/gorm_v2.yml 文件配置正确，相关配置项 IsInitGolobalGormMysql = 1 ，并且是设置连接的数据为：db_ginskeleton2_test
+// 单元测试涉及到的数据库下载地址：https://wwt.lanzoul.com/ivT3A06cq35i
 // 本文件测试到的相关数据表由于数据量较大, 最终的数据库文件没有放置在本项目骨架中，如果你动手能力很强，可以通过 issue 留言获取，重新进行测试
 // 更多使用用法参见官方文档：https://gorm.io/zh_CN/docs/v2_release_note.html
 
