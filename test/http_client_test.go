@@ -11,8 +11,14 @@ import (
 
 // 一个简单的get请求
 func TestHttpClient(t *testing.T) {
-	cli := goCurl.CreateHttpClient()
-	if resp, err := cli.Get("http://hq.sinajs.cn/list=sh601360"); err == nil {
+	cli := goCurl.CreateHttpClient(goCurl.Options{
+		Headers: map[string]interface{}{
+			"Referer": "http://vip.stock.finance.sina.com.cn",
+		},
+		SetResCharset: "GB18030",
+		BaseURI:       "",
+	})
+	if resp, err := cli.Get("http://hq.sinajs.cn/list=sz002594"); err == nil {
 		content, err := resp.GetContents()
 		if err != nil {
 			t.Errorf("单元测试未通过,返回值不符合要求：%s\n", content)

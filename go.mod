@@ -16,7 +16,7 @@ require (
 	github.com/gomodule/redigo v1.8.8
 	github.com/gorilla/websocket v1.5.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
-	github.com/qifengzhang007/goCurl v1.3.3
+	github.com/qifengzhang007/goCurl v1.3.4
 	github.com/qifengzhang007/sql_res_to_tree v1.0.15
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.12.0
