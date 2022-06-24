@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"goskeleton/app/global/consts"
 	"goskeleton/app/global/variable"
-	"goskeleton/app/http/middleware/my_jwt"
 	"goskeleton/app/model/users"
 	"goskeleton/app/service/users/curd"
 	userstoken "goskeleton/app/service/users/token"
@@ -145,13 +144,12 @@ func (u *Users) Destroy(context *gin.Context) {
 
 //6.获取用户token信息+动态菜单
 func (u *Users) UserInfo(context *gin.Context) {
-	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
-	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
+	UserId, exist := cur_userinfo.GetCurrentUserId(context)
 	if !exist {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
 	} else {
 		userService := curd.CreateUserCurdFactory()
-		if data := userService.FindUserInfo(currentUser.UserId); data != nil {
+		if data := userService.FindUserInfo(UserId); data != nil {
 			response.Success(context, consts.CurdStatusOkMsg, data)
 		} else {
 			response.Fail(context, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
@@ -162,13 +160,11 @@ func (u *Users) UserInfo(context *gin.Context) {
 //查询用户当前打开的页面允许显示的按钮（查询指定页面拥有的按钮权限）
 func (u *Users) GetButtonListByMenuId(context *gin.Context) {
 	menuId := context.GetFloat64(consts.ValidatorPrefix + "menu_id")
-	tokenKey := variable.ConfigYml.GetString("Token.BindContextKeyName")
-	currentUser, exist := context.MustGet(tokenKey).(my_jwt.CustomClaims)
-
+	UserId, exist := cur_userinfo.GetCurrentUserId(context)
 	if !exist {
 		response.Fail(context, consts.CurdTokenFailCode, consts.CurdTokenFailMsg, "")
 	} else {
-		data := curd.CreateUserCurdFactory().GetButtonListByMenuId(currentUser.UserId, int64(menuId))
+		data := curd.CreateUserCurdFactory().GetButtonListByMenuId(UserId, int64(menuId))
 		response.Success(context, consts.CurdStatusOkMsg, data)
 	}
 
