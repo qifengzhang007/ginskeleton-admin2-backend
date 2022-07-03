@@ -23,7 +23,7 @@ Token:
 Redis:
   Host: "127.0.0.1"
   Port: 6379
-  Auth: ""
+  Auth: ""  # 设置你的redis密码
   MaxIdle: 10
   MaxActive: 1000
   IdleTimeout: 60
