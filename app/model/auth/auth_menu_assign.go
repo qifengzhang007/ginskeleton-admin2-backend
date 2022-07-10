@@ -25,7 +25,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 			(CASE WHEN a.fid=0 THEN 1 ELSE 0 END)  AS  expand,
 			a.sort
 			FROM
-			tb_auth_system_menu a-- LEFT   JOIN tb_auth_system_menu_button  b ON a.id=b.fr_auth_system_menu_id
+			tb_auth_system_menu a
 			UNION  
 			SELECT 
 			IFNULL( c.id,0)+? AS button_id,
@@ -36,7 +36,7 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 			0 AS sort
 			FROM
 			tb_auth_system_menu_button  b   LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
-			ORDER   BY  sort  DESC,system_menu_button_id ASC,system_menu_fid ASC 
+			ORDER   BY  sort  DESC,system_menu_fid ASC , system_menu_button_id ASC
 			`
 	if res := a.Raw(sql, TmpVal).Find(&data); res.Error == nil && res.RowsAffected > 0 {
 		return res.RowsAffected, data
