@@ -10,7 +10,7 @@ import (
 )
 
 type Connect struct {
-	Token string `form:"token" binding:"required,min=1"`
+	Token string `form:"token" json:"token" binding:"required,min=1"`
 }
 
 // 验证器语法，参见 Register.go文件，有详细说明
