@@ -1,14 +1,17 @@
 package core
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
+	"errors"
 	"goskeleton/app/global/my_errors"
 	"goskeleton/app/global/variable"
+	"goskeleton/app/service/websocket/on_open_success"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 type Client struct {
@@ -21,6 +24,7 @@ type Client struct {
 	HeartbeatFailTimes int
 	State              uint8 // ws状态，1=ok；0=出错、掉线等
 	sync.RWMutex
+	on_open_success.ClientMoreParams // 这里追加一个结构体，方便开发者在成功上线后，可以自定义追加更多字段信息
 }
 
 // 处理握手+协议升级
@@ -82,14 +86,21 @@ func (c *Client) ReadPump(callbackOnMessage func(messageType int, receivedData [
 
 	// OnMessage事件
 	for {
-		mt, bReceivedData, err := c.Conn.ReadMessage()
-		if err == nil {
-			callbackOnMessage(mt, bReceivedData)
+		if c.State == 1 {
+			mt, bReceivedData, err := c.Conn.ReadMessage()
+			if err == nil {
+				callbackOnMessage(mt, bReceivedData)
+			} else {
+				// OnError事件读（消息出错)
+				callbackOnError(err)
+				break
+			}
 		} else {
-			// OnError事件
-			callbackOnError(err)
+			// OnError事件(状态不可用，一般是程序事先检测到双方无法进行通信，进行的回调)
+			callbackOnError(errors.New(my_errors.ErrorsWebsocketStateInvalid))
 			break
 		}
+
 	}
 }
 
@@ -129,6 +140,8 @@ func (c *Client) Heartbeat() {
 	//2.浏览器收到服务器的ping格式消息，会自动响应pong消息，将服务器消息原路返回过来
 	if c.ReadDeadline == 0 {
 		_ = c.Conn.SetReadDeadline(time.Time{})
+	} else {
+		_ = c.Conn.SetReadDeadline(time.Now().Add(c.ReadDeadline))
 	}
 	c.Conn.SetPongHandler(func(receivedPong string) error {
 		if c.ReadDeadline > time.Nanosecond {
@@ -147,6 +160,7 @@ func (c *Client) Heartbeat() {
 				if err := c.SendMessage(websocket.PingMessage, variable.WebsocketServerPingMsg); err != nil {
 					c.HeartbeatFailTimes++
 					if c.HeartbeatFailTimes > variable.ConfigYml.GetInt("Websocket.HeartbeatFailMaxTimes") {
+						c.State = 0
 						variable.ZapLog.Error(my_errors.ErrorsWebsocketBeatHeartsMoreThanMaxTimes, zap.Error(err))
 						return
 					}
@@ -158,6 +172,7 @@ func (c *Client) Heartbeat() {
 			} else {
 				return
 			}
+
 		}
 	}
 }
