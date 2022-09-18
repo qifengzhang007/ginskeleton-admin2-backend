@@ -38,16 +38,27 @@ func (u *Users) Login(context *gin.Context) {
 	pass := context.GetString(consts.ValidatorPrefix + "pass")
 	phone := context.GetString(consts.ValidatorPrefix + "phone")
 
+	// 登陆安全策略是否开启
+	loginPolicyIsOpen := variable.ConfigYml.GetInt64("LoginPolicy.IsOpenPolicy")
 	// 登陆之前检查账号是否被登陆策略禁用
-	lpf := login_policy.CreateUsersLoginPolicyFactory()
-	if forbidden, err := lpf.CheckAccountIsForbidden(userName); err == nil && forbidden {
-		response.Fail(context, consts.CurdLoginFailCode, "该账号已被登陆策略自动禁止登陆, 请至少等待2分钟后再试", "")
-		return
+	var lpf *login_policy.UserLoginPolicy
+	if loginPolicyIsOpen == 1 {
+		lpf = login_policy.CreateUsersLoginPolicyFactory()
+		if lpf != nil {
+			defer lpf.ReleaseRedisConn()
+			if forbidden, err := lpf.CheckAccountIsForbidden(userName); err == nil && forbidden {
+				response.Fail(context, consts.CurdLoginFailCode, "该账号已被登陆策略自动禁止登陆, 请至少等待2分钟后再试", "")
+				return
+			}
+		}
 	}
+
 	userModel := users.CreateUserFactory("").Login(userName, pass)
 	if userModel != nil {
 		// 成功登陆调用登陆策略，自动会将之前的失败次数清0
-		_, _ = lpf.SetAccountLoginCache(userName, false)
+		if loginPolicyIsOpen == 1 && lpf != nil {
+			_, _ = lpf.SetAccountLoginCache(userName, false)
+		}
 
 		userTokenFactory := userstoken.CreateUserFactory()
 		if userToken, err := userTokenFactory.GenerateToken(userModel.Id, userModel.UserName, userModel.Phone, variable.ConfigYml.GetInt64("Token.JwtTokenCreatedExpireAt")); err == nil {
@@ -67,8 +78,11 @@ func (u *Users) Login(context *gin.Context) {
 			fmt.Println("生成token出错：", err.Error())
 		}
 	}
-	// 登陆失败 - 调用登陆策略，自动会将之前的失败次数+1
-	_, _ = lpf.SetAccountLoginCache(userName, true)
+	if loginPolicyIsOpen == 1 && lpf != nil {
+		// 登陆失败 - 调用登陆策略，自动会将之前的失败次数+1
+		_, _ = lpf.SetAccountLoginCache(userName, true)
+	}
+
 	response.Fail(context, consts.CurdLoginFailCode, "账号或密码错误", "")
 }
 

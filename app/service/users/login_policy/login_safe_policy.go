@@ -12,16 +12,16 @@ import (
 // 账号登陆连续失败N次，会限制账号在M分钟内禁止登陆
 // N 、M 通过配置项设置
 
-func CreateUsersLoginPolicyFactory() *userLoginPolicy {
+func CreateUsersLoginPolicyFactory() *UserLoginPolicy {
 	redCli := redis_factory.GetOneRedisClient()
 	if redCli == nil {
 		variable.ZapLog.Error("redis 初始化出错-请在配置项检查redis配置参数")
 		return nil
 	}
-	return &userLoginPolicy{redisClient: redCli, keyPre: "login_fail_times:"}
+	return &UserLoginPolicy{redisClient: redCli, keyPre: "login_fail_times:"}
 }
 
-type userLoginPolicy struct {
+type UserLoginPolicy struct {
 	redisClient *redis_factory.RedisClient
 	keyPre      string
 }
@@ -29,7 +29,7 @@ type userLoginPolicy struct {
 // CheckAccountIsForbidden 检查账号是否被禁止登陆
 // @account 账号
 // @return false 表示账号没有禁用；true 表示账号被禁用
-func (u *userLoginPolicy) CheckAccountIsForbidden(account string) (bool, error) {
+func (u *UserLoginPolicy) CheckAccountIsForbidden(account string) (bool, error) {
 	if !u.accountIsExists(account) {
 		return false, nil
 	}
@@ -48,7 +48,7 @@ func (u *userLoginPolicy) CheckAccountIsForbidden(account string) (bool, error) 
 // AccountIsExists 判断账号是否存在
 // @account 账号
 // @return false 表示账号不存在；true 表示账号已经存在 于redis
-func (u *userLoginPolicy) accountIsExists(account string) bool {
+func (u *UserLoginPolicy) accountIsExists(account string) bool {
 	if val, err := u.redisClient.Int(u.redisClient.Execute("exists", u.keyPre+account)); err == nil && val > 0 {
 		return true
 	}
@@ -59,7 +59,7 @@ func (u *userLoginPolicy) accountIsExists(account string) bool {
 // @account 登陆账号
 // @isFail 登陆是否失败
 // @return 返回登录失败的累计次数
-func (u *userLoginPolicy) SetAccountLoginCache(account string, isFail bool) (int64, error) {
+func (u *UserLoginPolicy) SetAccountLoginCache(account string, isFail bool) (int64, error) {
 	// 如果是登陆失败，对应账号的等次失败次数+1
 	if isFail {
 		// 只要登录失败，失败次数就+1，（相关key不存在会自动创建）
@@ -97,7 +97,7 @@ func (u *userLoginPolicy) SetAccountLoginCache(account string, isFail bool) (int
 }
 
 // getFailTotalTimes 获取登录失败的累计次数
-func (u *userLoginPolicy) getFailTotalTimes(account string) (int64, error) {
+func (u *UserLoginPolicy) getFailTotalTimes(account string) (int64, error) {
 	// 继续获取已经累计失败的次数
 	if totalFilaTimes, err := u.redisClient.Int64(u.redisClient.Execute("get", u.keyPre+account)); err == nil {
 		return totalFilaTimes, nil
@@ -110,7 +110,7 @@ func (u *userLoginPolicy) getFailTotalTimes(account string) (int64, error) {
 // setCountDown 当超过登陆最大失败次数时，键设置倒计时的过期时间
 // @account 过期的账号
 // @second 过期的时间戳(时间点)
-func (u *userLoginPolicy) setCountDown(account string) error {
+func (u *UserLoginPolicy) setCountDown(account string) error {
 	expireSeconds := variable.ConfigYml.GetInt64("LoginPolicy.LoginFailCountDown")
 	if expireSeconds < 1 {
 		variable.ZapLog.Error("登陆策略配置错 - LoginPolicy.MaxLoginFailTimes 必须设置一个有效的禁止登陆倒计时(秒)")
@@ -125,6 +125,6 @@ func (u *userLoginPolicy) setCountDown(account string) error {
 }
 
 // ReleaseRedisConn 释放redis
-func (u *userLoginPolicy) ReleaseRedisConn() {
+func (u *UserLoginPolicy) ReleaseRedisConn() {
 	u.redisClient.ReleaseOneRedisClient()
 }
