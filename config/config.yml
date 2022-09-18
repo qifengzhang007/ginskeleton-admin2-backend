@@ -20,6 +20,10 @@ Token:
   BindContextKeyName: "userToken"  #用户在 header 头部提交的token绑定到上下文时的键名，方便直接从上下文(gin.context)直接获取每个用户的id等信息
   IsCacheToRedis: 0                #用户token是否缓存到redis, 如果已经正确配置了redis,建议设置为1, 开启redis缓存token，（1=用户token缓存到redis; 0=token只存在于mysql）
 
+LoginPolicy:  #账号登陆策略
+  MaxLoginFailTimes: 3   #登陆连续失败的最大次数
+  LoginFailCountDown: 120  #连续登陆失败超限后限制120秒(请自行修改)内禁止登陆
+
 Redis:
   Host: "127.0.0.1"
   Port: 6379

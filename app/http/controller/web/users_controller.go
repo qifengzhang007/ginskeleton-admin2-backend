@@ -7,6 +7,7 @@ import (
 	"goskeleton/app/global/variable"
 	"goskeleton/app/model/users"
 	"goskeleton/app/service/users/curd"
+	"goskeleton/app/service/users/login_policy"
 	userstoken "goskeleton/app/service/users/token"
 	"goskeleton/app/utils/cur_userinfo"
 	"goskeleton/app/utils/response"
@@ -31,13 +32,23 @@ func (u *Users) Register(context *gin.Context) {
 	}
 }
 
-//  2.用户登录
+// 2.用户登录
 func (u *Users) Login(context *gin.Context) {
 	userName := context.GetString(consts.ValidatorPrefix + "user_name")
 	pass := context.GetString(consts.ValidatorPrefix + "pass")
 	phone := context.GetString(consts.ValidatorPrefix + "phone")
+
+	// 登陆之前检查账号是否被登陆策略禁用
+	lpf := login_policy.CreateUsersLoginPolicyFactory()
+	if forbidden, err := lpf.CheckAccountIsForbidden(userName); err == nil && forbidden {
+		response.Fail(context, consts.CurdLoginFailCode, "该账号已被登陆策略自动禁止登陆, 请至少等待2分钟后再试", "")
+		return
+	}
 	userModel := users.CreateUserFactory("").Login(userName, pass)
 	if userModel != nil {
+		// 成功登陆调用登陆策略，自动会将之前的失败次数清0
+		_, _ = lpf.SetAccountLoginCache(userName, false)
+
 		userTokenFactory := userstoken.CreateUserFactory()
 		if userToken, err := userTokenFactory.GenerateToken(userModel.Id, userModel.UserName, userModel.Phone, variable.ConfigYml.GetInt64("Token.JwtTokenCreatedExpireAt")); err == nil {
 			if userTokenFactory.RecordLoginToken(userToken, context.ClientIP()) {
@@ -56,7 +67,9 @@ func (u *Users) Login(context *gin.Context) {
 			fmt.Println("生成token出错：", err.Error())
 		}
 	}
-	response.Fail(context, consts.CurdLoginFailCode, consts.CurdLoginFailMsg, "")
+	// 登陆失败 - 调用登陆策略，自动会将之前的失败次数+1
+	_, _ = lpf.SetAccountLoginCache(userName, true)
+	response.Fail(context, consts.CurdLoginFailCode, "账号或密码错误", "")
 }
 
 // 刷新用户token
@@ -72,7 +85,7 @@ func (u *Users) RefreshToken(context *gin.Context) {
 	}
 }
 
-//3.用户查询（show）
+// 3.用户查询（show）
 func (u *Users) List(context *gin.Context) {
 	userName := context.GetString(consts.ValidatorPrefix + "user_name")
 	page := context.GetFloat64(consts.ValidatorPrefix + "page")
@@ -87,7 +100,7 @@ func (u *Users) List(context *gin.Context) {
 	}
 }
 
-//3.用户查询（PostList），根据部门、岗位id，用户名关键词查询数据
+// 3.用户查询（PostList），根据部门、岗位id，用户名关键词查询数据
 func (u *Users) PostList(context *gin.Context) {
 	orgPostName := context.GetString(consts.ValidatorPrefix + "org_post_name")
 	userName := context.GetString(consts.ValidatorPrefix + "user_name")
@@ -103,7 +116,7 @@ func (u *Users) PostList(context *gin.Context) {
 	}
 }
 
-//4.用户新增(store)
+// 4.用户新增(store)
 func (u *Users) Create(context *gin.Context) {
 	if users.CreateUserFactory("").InsertData(context) {
 		response.Success(context, consts.CurdStatusOkMsg, "")
@@ -112,7 +125,7 @@ func (u *Users) Create(context *gin.Context) {
 	}
 }
 
-//5.用户更新(update)
+// 5.用户更新(update)
 func (u *Users) Edit(context *gin.Context) {
 	userId := context.GetFloat64(consts.ValidatorPrefix + "id")
 	userName := context.GetString(consts.ValidatorPrefix + "user_name")
@@ -132,7 +145,7 @@ func (u *Users) Edit(context *gin.Context) {
 
 }
 
-//6.删除记录
+// 6.删除记录
 func (u *Users) Destroy(context *gin.Context) {
 	userId := context.GetFloat64(consts.ValidatorPrefix + "id")
 	if users.CreateUserFactory("").DeleteData(int(userId)) {
@@ -142,7 +155,7 @@ func (u *Users) Destroy(context *gin.Context) {
 	}
 }
 
-//6.获取用户token信息+动态菜单
+// 6.获取用户token信息+动态菜单
 func (u *Users) UserInfo(context *gin.Context) {
 	UserId, exist := cur_userinfo.GetCurrentUserId(context)
 	if !exist {
@@ -157,7 +170,7 @@ func (u *Users) UserInfo(context *gin.Context) {
 	}
 }
 
-//查询用户当前打开的页面允许显示的按钮（查询指定页面拥有的按钮权限）
+// 查询用户当前打开的页面允许显示的按钮（查询指定页面拥有的按钮权限）
 func (u *Users) GetButtonListByMenuId(context *gin.Context) {
 	menuId := context.GetFloat64(consts.ValidatorPrefix + "menu_id")
 	UserId, exist := cur_userinfo.GetCurrentUserId(context)
