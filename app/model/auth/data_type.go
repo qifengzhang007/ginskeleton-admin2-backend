@@ -57,9 +57,7 @@ type AllAuth struct {
 	Fid   int    `json:"fid"`
 }
 
-// 岗位成员
-//
-//	定义不同的查询结果返回的数据结构体
+// 定义不同的查询结果返回的数据结构体
 type MemberList struct {
 	Id        int    `json:"id"`
 	OrgPostId int    `json:"org_post_id"`
