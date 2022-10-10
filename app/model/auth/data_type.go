@@ -57,8 +57,9 @@ type AllAuth struct {
 	Fid   int    `json:"fid"`
 }
 
-//岗位成员
-//  定义不同的查询结果返回的数据结构体
+// 岗位成员
+//
+//	定义不同的查询结果返回的数据结构体
 type MemberList struct {
 	Id        int    `json:"id"`
 	OrgPostId int    `json:"org_post_id"`
@@ -72,9 +73,7 @@ type MemberList struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// 系统菜单
-
-//查询显示的菜单列表，结合了待分配的按钮作为子级数据显示
+// 查询显示的菜单列表，结合了待分配的按钮作为子级数据显示
 type AuthSystemMenuButtonList struct {
 	Id                 int
 	Fid                int
@@ -114,7 +113,7 @@ type AuthSystemMenuButtonListTree struct {
 	} `json:"button_list" gorm:"-"`
 }
 
-//接口返回数据类型结构体（左侧菜单树）
+// 接口返回数据类型结构体（左侧菜单树）
 type AuthSystemMenuTree struct {
 	Id         int                  `json:"id" primaryKey:"yes" `
 	Fid        int                  `json:"fid" fid:"Id"`
@@ -124,6 +123,7 @@ type AuthSystemMenuTree struct {
 	Path       string               `gorm:"path" json:"path"`
 	NodeLevel  int                  `json:"node_level"`
 	Component  string               `json:"component"`
+	IsOutPage  int                  `json:"is_out_page"`
 	HasSubNode int                  `json:"has_sub_node"`
 	IsLeaf     bool                 `json:"is_leaf"`
 	Children   []AuthSystemMenuTree `gorm:"-" json:"children"`

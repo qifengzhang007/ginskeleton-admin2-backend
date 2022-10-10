@@ -86,7 +86,7 @@ func (a *AuthSystemMenuModel) GetMenuLevel(fid int) (nodeLevel int64) {
 	return
 }
 
-//新增
+// 新增
 func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuModel) {
 	var tmp AuthSystemMenuModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
@@ -141,7 +141,7 @@ func (a *AuthSystemMenuModel) updatePathInfoNodeLevel(curItemid int64) bool {
 	return false
 }
 
-//根据id查询是否有子节点数据
+// 根据id查询是否有子节点数据
 func (a *AuthSystemMenuModel) GetSubNodeCount(id int) (count int64) {
 	if res := a.Model(a).Where("fid = ?", id).Count(&count); res.Error != nil {
 		variable.ZapLog.Error("AuthSystemMenuModel 查询子节点是否有数据出错：", zap.Error(res.Error))
@@ -160,10 +160,10 @@ func (a *AuthSystemMenuModel) DeleteData(id int) bool {
 	return false
 }
 
-//根据IDS获取菜单信息
+// 根据IDS获取菜单信息
 func (a *AuthSystemMenuModel) GetByIds(ids []int) (AuthSystemMenuTree []AuthSystemMenuTree) {
 	sql := `
-			SELECT a.id ,a.fid, a.title, a.name, TRIM(a.icon) as icon, a.name as  path, a.node_level,a.component ,
+			SELECT a.id ,a.fid, a.title, a.name, TRIM(a.icon) as icon, a.name as  path, a.node_level,a.component ,a.is_out_page,
 			IFNULL((SELECT 1 FROM tb_auth_system_menu b WHERE  b.fid=a.id  LIMIT 1),0) as has_sub_node
 			FROM tb_auth_system_menu a  WHERE id IN (?) AND a.status=1 
 			ORDER BY a.sort desc
