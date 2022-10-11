@@ -102,7 +102,7 @@ func (a *AuthMenuAssignModel) AssginAuthForOrg(orgId, systemMenuButtonId, system
 		var tmpSystemMenuId = systemMenuButtonId
 		var tmpFid = 0
 		for i := 0; i < 3; i++ {
-			if res := a.Exec(sql, orgId, systemMenuButtonId, orgId, systemMenuButtonId); res.Error == nil {
+			if res := a.Exec(sql, orgId, tmpSystemMenuId, orgId, tmpSystemMenuId); res.Error == nil {
 				tmpSql := "select a.fid  from  tb_auth_system_menu a where  a.id=?"
 				if _ = a.Raw(tmpSql, tmpSystemMenuId).First(&tmpFid); tmpFid > 0 {
 					tmpSystemMenuId = tmpFid
@@ -168,7 +168,7 @@ func (a *AuthMenuAssignModel) DeleteAuthFromOrg(postMountHasMenuId, postMountHas
 	return false
 }
 
-//  删除 casbin 表接口已分配的权限
+// 删除 casbin 表接口已分配的权限
 func (a *AuthMenuAssignModel) DeleteCasbibRules(authPostMountHasMenuButtonId int, nodeType string) (resBool bool) {
 	resBool = true
 	if nodeType == "button" {
