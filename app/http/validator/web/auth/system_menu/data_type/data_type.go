@@ -14,6 +14,7 @@ type MenuCreate struct {
 	Icon         string   `form:"icon" json:"icon"`
 	Fid          *float64 `form:"fid" json:"fid" binding:"required,min=0"`
 	Status       *float64 `form:"status" json:"status" binding:"required,min=0"`
+	IsOutPage    *float64 `form:"is_out_page" json:"is_out_page" binding:"required,min=0,max=1"`
 	Sort         *float64 `form:"sort" json:"sort" binding:"required,min=0"`
 	Name         string   `form:"name" json:"name" binding:"required,min=1"`
 	Path         string   `form:"path" json:"path" `

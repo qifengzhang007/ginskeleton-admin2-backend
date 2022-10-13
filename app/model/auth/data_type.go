@@ -82,6 +82,8 @@ type AuthSystemMenuButtonList struct {
 	Path               string
 	Component          string
 	Status             int
+	NodeLevel          int
+	IsOutPage          int
 	Sort               int
 	Remark             string
 	FrAuthSystemMenuId int
@@ -101,6 +103,8 @@ type AuthSystemMenuButtonListTree struct {
 	Path      string `json:"path"`
 	Component string `json:"component"`
 	Status    int    `json:"status"`
+	IsOutPage int    `json:"is_out_page"`
+	NodeLevel int    `json:"node_level"`
 	Sort      int    `json:"sort"`
 	Remark    string `json:"remark"`
 	Children  []struct {

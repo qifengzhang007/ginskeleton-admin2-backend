@@ -23,6 +23,7 @@ type AuthSystemMenuModel struct {
 	Path      string `json:"path"`
 	Component string `json:"component"`
 	Status    int    `json:"status"`
+	IsOutPage int    `json:"is_out_page"`
 	Sort      int    `json:"sort"`
 	Remark    string `json:"remark"`
 }
@@ -43,7 +44,7 @@ func (a *AuthSystemMenuModel) List(limitStart int, limit int, fid int, title str
 	counts = a.getCounts(fid, title)
 	if counts > 0 {
 		sql := `
-			SELECT   a.id,  a.fid,  a.icon,  a.title,  a.name,  a.path,  a.component, a.status,a.remark ,a.sort,
+			SELECT   a.id,  a.fid,  a.icon,  a.title,  a.name,  a.path,  a.component, a.status,a.remark ,a.sort,a.is_out_page,a.node_level,
 			IFNULL(b.fr_auth_system_menu_id ,0) AS fr_auth_system_menu_id,
 			IFNULL(c.id,0)  AS button_id,IFNULL(c.cn_name,'')  AS   button_name, IFNULL(c.color,'') AS  button_color 
 			FROM   tb_auth_system_menu a  LEFT JOIN  tb_auth_system_menu_button  b ON  a.id =b.fr_auth_system_menu_id
