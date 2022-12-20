@@ -61,7 +61,7 @@ func (a *SystemMenuController) Create(c *gin.Context) {
 			return
 		}
 	}
-	response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg, "请注意不要添加重复数据")
+	response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg+", 请注意不要添加重复数据", "")
 }
 
 // 1.修改
