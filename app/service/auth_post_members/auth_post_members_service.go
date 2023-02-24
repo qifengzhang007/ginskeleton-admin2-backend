@@ -10,9 +10,12 @@ import (
 type AuthPostMembersService struct {
 }
 
-//根据用户ID获取所属的组织机构
+// 根据用户ID获取所属的组织机构
 func (a AuthPostMembersService) FindOrgs(id int64) []auth.OrgTree {
 	orgs := auth.CreateAuthMenuAssignFactory("").GetAuthByUserId(int(id))
+	if len(orgs) == 0 {
+		return nil
+	}
 	var dest = make([]auth.OrgTree, 0)
 	err := sql_res_to_tree.CreateSqlResFormatFactory().ScanToTreeData(orgs, &dest)
 	if err != nil {

@@ -74,13 +74,16 @@ func (a *OrganizationPostController) Destroy(c *gin.Context) {
 	}
 }
 
-//根据用户ID获取所有的组织机构和权限
+// 根据用户ID获取所有的组织机构和权限
 func (a *OrganizationPostController) GetAuthByUserId(c *gin.Context) {
 	//var err error
 	//models := model.CreateAuthOrganizationFactory("")
 	id := c.GetFloat64(consts.ValidatorPrefix + "id")
 	//根据用户ID,查询隶属哪些组织机构
 	data := (&auth_post_members.AuthPostMembersService{}).FindOrgs(int64(id))
-	//model.CreateAuthPostMembersModelFactory("")
-	response.Success(c, consts.CurdStatusOkMsg, data)
+	if len(data) > 0 {
+		response.Success(c, consts.CurdStatusOkMsg, data)
+	} else {
+		response.Fail(c, consts.CurdSelectFailCode, consts.CurdSelectFailMsg, "")
+	}
 }
