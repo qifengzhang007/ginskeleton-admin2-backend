@@ -61,7 +61,7 @@ func (a *SystemMenuController) Create(c *gin.Context) {
 			return
 		}
 	}
-	response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg+", 请注意不要添加重复数据", "")
+	response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg+", 请注意不要添加菜单名称、路由名称.", "")
 }
 
 // 1.修改

@@ -92,7 +92,7 @@ func (a *AuthSystemMenuModel) InsertData(c *gin.Context) (bool, AuthSystemMenuMo
 	var tmp AuthSystemMenuModel
 	if err := data_bind.ShouldBindFormDataToModel(c, &tmp); err == nil {
 		var counts int64
-		if res := a.Model(a).Where("fid=? AND  title=?", tmp.Fid, tmp.Title).Count(&counts); res.Error == nil && counts == 0 {
+		if res := a.Model(a).Where("fid=? AND  (title=? OR name=?)", tmp.Fid, tmp.Title, tmp.Name).Count(&counts); res.Error == nil && counts == 0 {
 			if res := a.Create(&tmp); res.Error == nil {
 				//新增菜单后,处理按钮
 				go a.updatePathInfoNodeLevel(tmp.Id)

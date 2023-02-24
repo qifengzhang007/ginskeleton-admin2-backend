@@ -36,15 +36,14 @@ func (a *AuthSystemMenuService) AssginedMenuButtonToTree(sqlRes []auth.AssignedS
 	return nil
 }
 
-//处理按钮字符串
+// 处理按钮字符串
 func (a *AuthSystemMenuService) ButtonStringToArray(jsonStr string) []map[string]interface{} {
 	mSlice := make([]map[string]interface{}, 0)
 	_ = json.Unmarshal([]byte(jsonStr), &mSlice)
 	return mSlice
 }
 
-//将按钮循环加入表中
-//处理按钮字符串
+// 将按钮循环加入表中
 func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64) bool {
 	if menuButtonList, isOk := context.MustGet(variable.SystemCreateKey).(data_type.MenuCreate); isOk {
 		for index, item := range menuButtonList.ButtonArray {
@@ -63,8 +62,7 @@ func (a *AuthSystemMenuService) InsertButton(context *gin.Context, menuId int64)
 	return false
 }
 
-//将按钮循环加入表中
-//处理按钮字符串
+// 更新按钮数据
 func (a *AuthSystemMenuService) UpdateButton(context *gin.Context, menuId int64) bool {
 	if menuButtonList, isOk := context.MustGet(variable.SystemEditKey).(data_type.MenuEdit); isOk {
 		//修改数据过程中可能存在单条数据被删除的情况，首先删除已标记的数据
