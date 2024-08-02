@@ -22,7 +22,8 @@ type Client struct {
 	ReadDeadline       time.Duration
 	WriteDeadline      time.Duration
 	HeartbeatFailTimes int
-	State              uint8 // ws状态，1=ok；0=出错、掉线等
+	ClientLastPongTime time.Time // 客户端最近一次响应服务端 ping 消息的时间
+	State              uint8     // ws状态，1=ok；0=出错、掉线等
 	sync.RWMutex
 	on_open_success.ClientMoreParams // 这里追加一个结构体，方便开发者在成功上线后，可以自定义追加更多字段信息
 }
@@ -66,6 +67,7 @@ func (c *Client) OnOpen(context *gin.Context) (*Client, bool) {
 		c.Conn.SetReadLimit(variable.ConfigYml.GetInt64("Websocket.MaxMessageSize")) // 设置最大读取长度
 		c.Hub.Register <- c
 		c.State = 1
+		c.ClientLastPongTime = time.Now()
 		return c, true
 	}
 
@@ -149,7 +151,9 @@ func (c *Client) Heartbeat() {
 		} else {
 			_ = c.Conn.SetReadDeadline(time.Time{})
 		}
-		//fmt.Println("浏览器收到ping标准格式，自动将消息原路返回给服务器：", received_pong)  // 接受到的消息叫做pong，实际上就是服务器发送出去的ping数据包
+		// 客户端响应了服务端的ping消息以后，更新最近一次响应的时间
+		c.ClientLastPongTime = time.Now()
+		//fmt.Println("浏览器收到ping标准格式，自动将消息原路返回给服务器：", receivedPong) // 接受到的消息叫做pong，实际上就是服务器发送出去的ping数据包
 		return nil
 	})
 	//3.自动心跳数据
@@ -157,10 +161,23 @@ func (c *Client) Heartbeat() {
 		select {
 		case <-ticker.C:
 			if c.State == 1 {
+				// 这里优先检查客户端最后一次响应ping消息的时间是否超过了服务端允许的最大时间
+				// 这种检测针对断电、暴力测试中的拔网线很有用，因为直接断电、拔掉网线，客户端所有的回调函数(close、error等)相关的窗台数据无法传递出去，服务端的socket文件状态无法更新，
+				// 服务端无法在第一时间感知到客户端掉线
+				serverAllowMaxOfflineSeconds := float64(variable.ConfigYml.GetInt("Websocket.HeartbeatFailMaxTimes")) * (float64(variable.ConfigYml.GetDuration("Websocket.PingPeriod")))
+				if time.Now().Sub(c.ClientLastPongTime).Seconds() > serverAllowMaxOfflineSeconds {
+					c.State = 0
+					c.Hub.UnRegister <- c // 掉线的客户端统一注销
+					variable.ZapLog.Warn(my_errors.ErrorsWebsocketClientOfflineTimeout, zap.Float64("timeout(seconds): ", serverAllowMaxOfflineSeconds))
+					return
+				}
+
+				// 下面是正常的检测逻辑，只要正常关闭浏览器、通过操作按钮等退出客户端，以下代码就是有效的
 				if err := c.SendMessage(websocket.PingMessage, variable.WebsocketServerPingMsg); err != nil {
 					c.HeartbeatFailTimes++
 					if c.HeartbeatFailTimes > variable.ConfigYml.GetInt("Websocket.HeartbeatFailMaxTimes") {
 						c.State = 0
+						c.Hub.UnRegister <- c // 掉线的客户端统一注销
 						variable.ZapLog.Error(my_errors.ErrorsWebsocketBeatHeartsMoreThanMaxTimes, zap.Error(err))
 						return
 					}

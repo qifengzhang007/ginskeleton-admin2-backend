@@ -52,6 +52,7 @@ const (
 	ErrorsWebsocketSetWriteDeadlineFail       string = "websocket  设置消息写入截止时间出错"
 	ErrorsWebsocketWriteMgsFail               string = "websocket  Write Msg(send msg) 失败"
 	ErrorsWebsocketStateInvalid               string = "websocket  state 状态已经不可用(掉线、卡死等愿意，造成双方无法进行数据交互)"
+	ErrorsWebsocketClientOfflineTimeout       string = "websocket 客户端响应ping消息超过服务端允许的最长时间(秒):"
 
 	// rabbitMq
 	ErrorsRabbitMqReconnectFail string = "RabbitMq消费者端掉线后重连失败，超过尝试最大次数"
