@@ -4,6 +4,7 @@ package auth
 
 // 待分配系统的菜单、model、按钮返回结构体
 type AuthSystemMenuButton struct {
+	AutoKey            int
 	SystemMenuFid      int
 	SystemMenuButtonId int
 	FrAuthSystemMenuId int
@@ -16,6 +17,7 @@ type AuthSystemMenuButton struct {
 
 // AssignedSystemMenuButton 已分配系统给部门、岗位的的菜单、按钮返回结构体
 type AssignedSystemMenuButton struct {
+	AutoKey                int
 	SystemMenuButtonId     int
 	SystemMenuFid          int
 	Title                  string

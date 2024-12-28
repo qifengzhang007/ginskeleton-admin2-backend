@@ -20,22 +20,23 @@ type AuthMenuAssignModel struct {
 // 注意：按钮的id有可能和主菜单id重复，所以按钮id基准值增加 100000 （10万），后续分配权限时减去 10万即可
 func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []AuthSystemMenuButton) {
 	sql := `
-			SELECT a.id  AS  system_menu_button_id,a.fid  AS  system_menu_fid,a.title,
+			SELECT @row_number:=@row_number+1 as  auto_key, a.id  AS  system_menu_button_id,a.fid  AS  system_menu_fid,a.title,
 			'menu'  AS node_type,
 			(CASE WHEN a.fid=0 THEN 1 ELSE 0 END)  AS  expand,
 			a.sort
 			FROM
-			tb_auth_system_menu a
+			tb_auth_system_menu a  CROSS JOIN (SELECT @row_number:=0) AS t0
 			UNION  
 			SELECT 
-			IFNULL( c.id,0)+? AS button_id,
+			@row_number:=@row_number+1 as  auto_key, IFNULL( c.id,0)+? AS button_id,
 			IFNULL( b.fr_auth_system_menu_id,0) AS fr_auth_system_menu_id,
 			IFNULL(c.cn_name,'') AS button_name,
 			'button' AS node_type,
 			0  AS  expand,
 			0 AS sort
 			FROM
-			tb_auth_system_menu_button  b   LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
+			tb_auth_system_menu_button  b   
+			LEFT JOIN  tb_auth_button_cn_en  c  ON  b.fr_auth_button_cn_en_id=c.id
 			ORDER   BY  sort  DESC,system_menu_fid ASC , system_menu_button_id ASC
 			`
 	if res := a.Raw(sql, TmpVal).Find(&data); res.Error == nil && res.RowsAffected > 0 {
@@ -51,17 +52,19 @@ func (a *AuthMenuAssignModel) GetSystemMenuButtonList() (counts int64, data []Au
 func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts int64, data []AssignedSystemMenuButton) {
 	sql := `
 			SELECT  
+			 @row_number:=@row_number+1 as auto_key,
 			b.id AS  system_menu_button_id,b.fid AS system_menu_fid, b.title,
 			'menu' AS node_type,
 			(case  when b.fid=0 then 1 else 0  end) AS expand,
 			a.fr_auth_orgnization_post_id  AS org_post_id,a.id  AS  auth_post_mount_has_menu_id, b.sort  AS  sort1,0 AS  sort2 
 			FROM 
-			tb_auth_post_mount_has_menu  a , tb_auth_system_menu  b  
+			tb_auth_post_mount_has_menu  a , tb_auth_system_menu  b  CROSS JOIN (SELECT @row_number:=0) AS t0
 			WHERE  a.fr_auth_system_menu_id=b.id
 			AND  a.status=1
 			AND  a.fr_auth_orgnization_post_id=?
 			UNION
 			SELECT  
+			@row_number:=@row_number+1 as auto_key,
 			IFNULL(c.id,0)   AS  post_mount_has_menu_button_id,
 			a.fr_auth_system_menu_id,
 			IFNULL(d.cn_name,'')  AS  button_name,
@@ -69,7 +72,7 @@ func (a *AuthMenuAssignModel) GetAssignedMenuButtonList(orgPostId int) (counts i
 			0 AS expand, a.fr_auth_orgnization_post_id  AS org_post_id,
 			a.id  AS  auth_post_mount_has_menu_id  ,0 AS  sort1,  d.id  AS sort2
 			FROM 
-			tb_auth_post_mount_has_menu  a ,tb_auth_post_mount_has_menu_button  c  ,tb_auth_button_cn_en  d  
+			tb_auth_post_mount_has_menu  a ,tb_auth_post_mount_has_menu_button  c  ,tb_auth_button_cn_en  d
 			WHERE
 			a.id=c.fr_auth_post_mount_has_menu_id
 			AND
@@ -314,7 +317,7 @@ func (a *AuthMenuAssignModel) GetAuthByUserId(userId int) (OrgTree []OrgTree) {
 			d.fr_auth_system_menu_id=e.id 
 			UNION
 			SELECT
-			100000 AS  button_id ,
+			9000000+f.id AS  button_id ,
 			f.fr_auth_post_mount_has_menu_id*100 AS  fid ,
 			g.cn_name AS  button_name,
 			'button' AS  node_type,
