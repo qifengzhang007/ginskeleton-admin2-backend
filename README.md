@@ -7,8 +7,7 @@
 
 
 ### 更新日志
-#### v2.1.00  2024-12-28
+#### v2.1.01  2025-01-11
+> 本版本需要搭配 **[gin-skeleton-admin2-frontend](https://gitee.com/daitougege/gin-skeleton-admin2-frontend)** ≥ v2.1.00 .
 **更新**
-- 1.项目依赖包更新至最新版.
-- 2.项目中接口更新，适配前端界面更新后数据新格式.
-- 3.本版本需要搭配 **[gin-skeleton-admin2-frontend](https://gitee.com/daitougege/gin-skeleton-admin2-frontend)** ≥ v2.1.00 .
+- 1.修复cli提供示例代码中，全局变量调用顺序存在的bug. 
