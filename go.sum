@@ -168,8 +168,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/qifengzhang007/goCurl v1.4.0 h1:SyPxw3e8NZ/bhelabiIZPvTXDAyA3zrt4+Uq8tF5roE=
 github.com/qifengzhang007/goCurl v1.4.0/go.mod h1:uO0GEHw3DKIVMHIGw1kbtY9wUpL1eAm7hYxiCjmyvkc=
-github.com/qifengzhang007/sql_res_to_tree v1.0.15 h1:d3ovzs9ByjhwcBYYRkkihUiKKya2y0IlVQygfGHqJrc=
-github.com/qifengzhang007/sql_res_to_tree v1.0.15/go.mod h1:GWGWedG/Bo0Ni9TRpLGBGemucjEEOn+D/aIi+pEkSfo=
+github.com/qifengzhang007/sql_res_to_tree v1.0.17 h1:1STtjSgxIHvi4P8owO26Pghj5zGR/OOshL5b06YJb3M=
+github.com/qifengzhang007/sql_res_to_tree v1.0.17/go.mod h1:GWGWedG/Bo0Ni9TRpLGBGemucjEEOn+D/aIi+pEkSfo=
 github.com/rabbitmq/amqp091-go v1.10.0 h1:STpn5XsHlHGcecLmMFCtg7mqq0RnD+zFr4uzukfVhBw=
 github.com/rabbitmq/amqp091-go v1.10.0/go.mod h1:Hy4jKW5kQART1u+JkDTF9YYOQUHXqMuhrgxOEeS7G4o=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
