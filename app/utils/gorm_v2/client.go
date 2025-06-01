@@ -115,7 +115,7 @@ func getDbDialector(sqlType, readWrite string, dbConf ...ConfigParams) (gorm.Dia
 	return dbDialector, nil
 }
 
-//  根据配置参数生成数据库驱动 dsn
+// 根据配置参数生成数据库驱动 dsn
 func getDsn(sqlType, readWrite string, dbConf ...ConfigParams) string {
 	Host := variable.ConfigGormv2Yml.GetString("Gormv2." + sqlType + "." + readWrite + ".Host")
 	DataBase := variable.ConfigGormv2Yml.GetString("Gormv2." + sqlType + "." + readWrite + ".DataBase")
@@ -180,6 +180,6 @@ func getDsn(sqlType, readWrite string, dbConf ...ConfigParams) string {
 // 创建自定义日志模块，对 gorm 日志进行拦截、
 func redefineLog(sqlType string) gormLog.Interface {
 	return createCustomGormLog(sqlType,
-		SetInfoStrFormat("[info] %s\n"), SetWarnStrFormat("[warn] %s\n"), SetErrStrFormat("[error] %s\n"),
-		SetTraceStrFormat("[traceStr] %s [%.3fms] [rows:%v] %s\n"), SetTracWarnStrFormat("[traceWarn] %s %s [%.3fms] [rows:%v] %s\n"), SetTracErrStrFormat("[traceErr] %s %s [%.3fms] [rows:%v] %s\n"))
+		SetInfoStrFormat("[info] %s\n"), SetWarnStrFormat("[warn] %s\n"), SetTraceErrStrFormat("[error] %s\n"),
+		SetTraceStrFormat("[traceStr] %s [%.3fms] [rows:%v] %s\n"), SetTraceWarnStrFormat("[traceWarn] %s %s [%.3fms] [rows:%v] %s\n"), SetTracErrStrFormat("[traceErr] %s %s [%.3fms] [rows:%v] %s\n"))
 }
